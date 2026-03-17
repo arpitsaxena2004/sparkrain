@@ -1,0 +1,29 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Robot head circle -->
+  <circle cx="50" cy="40" r="25" fill="#e8f4f8" stroke="#1fb6c4" stroke-width="2"/>
+  
+  <!-- Robot antenna -->
+  <line x1="50" y1="15" x2="50" y2="5" stroke="#1fb6c4" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="5" r="4" fill="#1fb6c4"/>
+  
+  <!-- Robot eyes -->
+  <ellipse cx="42" cy="36" rx="4" ry="6" fill="#0d7377"/>
+  <ellipse cx="58" cy="36" rx="4" ry="6" fill="#0d7377"/>
+  
+  <!-- Robot smile -->
+  <path d="M 42 46 Q 50 52 58 46" stroke="#0d7377" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Robot ears/headphones -->
+  <circle cx="25" cy="40" r="12" fill="#1fb6c4" opacity="0.8"/>
+  <circle cx="75" cy="40" r="12" fill="#1fb6c4" opacity="0.8"/>
+  <circle cx="25" cy="40" r="8" fill="#0d7377"/>
+  <circle cx="75" cy="40" r="8" fill="#0d7377"/>
+  
+  <!-- Speech bubble -->
+  <path d="M 30 70 Q 30 65 35 65 L 65 65 Q 70 65 70 70 L 70 80 Q 70 85 65 85 L 45 85 L 35 95 L 40 85 L 35 85 Q 30 85 30 80 Z" fill="#b8d4d6" stroke="#1fb6c4" stroke-width="1"/>
+  
+  <!-- Speech bubble dots -->
+  <circle cx="45" cy="75" r="2" fill="#1fb6c4"/>
+  <circle cx="50" cy="75" r="2" fill="#1fb6c4"/>
+  <circle cx="55" cy="75" r="2" fill="#1fb6c4"/>
+</svg>
