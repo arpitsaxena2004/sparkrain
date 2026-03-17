@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{% block title %}AI Rainwater Harvesting{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_head %}{% endblock %}
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .mobile-padding { padding: 1rem; }
+            .mobile-text-sm { font-size: 0.875rem; }
+            .mobile-hidden { display: none; }
+            .mobile-full { width: 100%; }
+            .mobile-stack { flex-direction: column; }
+            .mobile-center { text-align: center; }
+            .mobile-space-y-4 > * + * { margin-top: 1rem; }
+            .mobile-space-y-2 > * + * { margin-top: 0.5rem; }
+        }
+        
+        /* Touch-friendly buttons */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Responsive font sizes */
+        .responsive-text-xl { font-size: clamp(1.125rem, 4vw, 1.25rem); }
+        .responsive-text-2xl { font-size: clamp(1.25rem, 5vw, 1.5rem); }
+        .responsive-text-3xl { font-size: clamp(1.5rem, 6vw, 1.875rem); }
+        .responsive-text-4xl { font-size: clamp(1.875rem, 7vw, 2.25rem); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+    <!-- Mobile-First Navbar -->
+    <nav class="bg-blue-600 shadow-lg text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-3 md:py-4">
+                <a href="{% url 'home' %}" class="responsive-text-xl font-bold flex items-center gap-2">
+                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    <span class="hidden sm:inline">JalNidhi AI</span>
+                    <span class="sm:hidden">JalNidhi</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden touch-target p-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="{% url 'home' %}" class="hover:text-blue-200 transition touch-target flex items-center">Home</a>
+                    <a href="{% url 'dashboard' %}" class="hover:text-blue-200 transition touch-target flex items-center">Dashboard</a>
+                    <a href="{% url 'analytics' %}" class="hover:text-blue-200 transition touch-target flex items-center">Analytics</a>
+                    <a href="{% url 'about' %}" class="hover:text-blue-200 transition touch-target flex items-center">About</a>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-blue-500 mt-3">
+                <div class="flex flex-col space-y-2 pt-3">
+                    <a href="{% url 'home' %}" class="block px-3 py-2 rounded-lg hover:bg-blue-700 transition touch-target">Home</a>
+                    <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-lg hover:bg-blue-700 transition touch-target">Dashboard</a>
+                    <a href="{% url 'analytics' %}" class="block px-3 py-2 rounded-lg hover:bg-blue-700 transition touch-target">Analytics</a>
+                    <a href="{% url 'about' %}" class="block px-3 py-2 rounded-lg hover:bg-blue-700 transition touch-target">About</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Mobile-Responsive Sidebar -->
+        <aside class="hidden md:block w-64 bg-white shadow-xl h-screen sticky top-[72px]">
+            <div class="p-6 space-y-4">
+                <a href="{% url 'home' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Home</a>
+                <a href="{% url 'dashboard' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Dashboard</a>
+                <a href="{% url 'analytics' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Analytics</a>
+                <a href="{% url 'about' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">About</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-6 lg:p-10">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Mobile-Optimized Chatbot Widget -->
+    <div id="chatbot-container" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
+        <!-- Chat Button -->
+        <button id="chat-toggle" class="bg-white hover:bg-gray-50 text-white rounded-full p-2 md:p-2 shadow-lg transition-all duration-300 transform hover:scale-110 border-2 border-blue-500 touch-target">
+            <img id="chat-icon" src="{% static 'core/chatbot-logo.svg' %}" alt="Chatbot" class="w-10 h-10 md:w-12 md:h-12">
+            <svg id="close-icon" class="w-6 h-6 md:w-8 md:h-8 hidden text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Mobile-Responsive Chat Window -->
+        <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 md:w-80 max-w-[calc(100vw-2rem)] h-96 max-h-[70vh] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+            <!-- Chat Header -->
+            <div class="bg-blue-600 text-white p-3 md:p-4 rounded-t-lg flex items-center gap-2 md:gap-3">
+                <img src="{% static 'core/chatbot-logo.svg' %}" alt="JalNidhi AI" class="w-8 h-8 md:w-10 md:h-10">
+                <div>
+                    <h3 class="font-semibold text-sm md:text-base">JalNidhi AI Assistant</h3>
+                    <p class="text-xs md:text-sm opacity-90">Ask me about rainwater harvesting!</p>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 text-sm">
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <p class="text-sm">Hello! I'm your rainwater harvesting assistant. I can help you with calculations, explain results, or answer questions. How can I help you today?</p>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="p-3 md:p-4 border-t border-gray-200">
+                <div class="flex space-x-2">
+                    <input type="text" id="chat-input" placeholder="Ask me anything..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm touch-target">
+                    <button id="send-message" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-2 rounded-lg transition-colors touch-target">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-4 md:py-6 text-center">
+        <p class="text-sm md:text-base">&copy; 2026 AI Rooftop Rainwater Harvesting Platform. All rights reserved.</p>
+    </footer>
+
+    <!-- Enhanced Mobile-Responsive JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        class Chatbot {
+            constructor() {
+                this.chatToggle = document.getElementById('chat-toggle');
+                this.chatWindow = document.getElementById('chat-window');
+                this.chatMessages = document.getElementById('chat-messages');
+                this.chatInput = document.getElementById('chat-input');
+                this.sendButton = document.getElementById('send-message');
+                this.chatIcon = document.getElementById('chat-icon');
+                this.closeIcon = document.getElementById('close-icon');
+                this.isOpen = false;
+
+                this.initEventListeners();
+                this.adjustChatWindowPosition();
+            }
+
+            initEventListeners() {
+                this.chatToggle.addEventListener('click', () => this.toggleChat());
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', () => this.adjustChatWindowPosition());
+            }
+
+            adjustChatWindowPosition() {
+                const chatWindow = this.chatWindow;
+                const isMobile = window.innerWidth < 768;
+                
+                if (isMobile) {
+                    // On mobile, make chat window take more screen space
+                    chatWindow.style.width = 'calc(100vw - 2rem)';
+                    chatWindow.style.maxWidth = '100%';
+                    chatWindow.style.right = '1rem';
+                    chatWindow.style.left = '1rem';
+                    chatWindow.style.maxHeight = '70vh';
+                } else {
+                    // Desktop positioning
+                    chatWindow.style.width = '20rem';
+                    chatWindow.style.right = '0';
+                    chatWindow.style.left = 'auto';
+                    chatWindow.style.maxHeight = '24rem';
+                }
+            }
+
+            toggleChat() {
+                this.isOpen = !this.isOpen;
+                
+                if (this.isOpen) {
+                    this.chatWindow.classList.remove('hidden');
+                    this.chatIcon.classList.add('hidden');
+                    this.closeIcon.classList.remove('hidden');
+                    this.chatInput.focus();
+                    this.adjustChatWindowPosition();
+                } else {
+                    this.chatWindow.classList.add('hidden');
+                    this.chatIcon.classList.remove('hidden');
+                    this.closeIcon.classList.add('hidden');
+                }
+            }
+
+            async sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+
+                // Add user message
+                this.addMessage(message, 'user');
+                this.chatInput.value = '';
+
+                // Show typing indicator
+                const typingId = this.addTypingIndicator();
+
+                try {
+                    const response = await fetch('/api/chatbot/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Remove typing indicator
+                    this.removeTypingIndicator(typingId);
+
+                    if (response.ok) {
+                        this.addMessage(data.response, 'bot');
+                    } else {
+                        this.addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                    }
+                } catch (error) {
+                    this.removeTypingIndicator(typingId);
+                    this.addMessage('Sorry, I\'m having trouble connecting. Please try again.', 'bot');
+                }
+            }
+
+            addMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = sender === 'user' 
+                    ? 'bg-blue-600 text-white p-3 rounded-lg ml-4 md:ml-8 text-sm break-words'
+                    : 'bg-gray-100 p-3 rounded-lg mr-4 md:mr-8 text-sm break-words';
+                
+                // Convert markdown-style formatting to HTML
+                const formattedMessage = message
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                
+                messageDiv.innerHTML = formattedMessage;
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            addTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                const id = 'typing-' + Date.now();
+                typingDiv.id = id;
+                typingDiv.className = 'bg-gray-100 p-3 rounded-lg mr-4 md:mr-8 text-sm';
+                typingDiv.innerHTML = '<div class="flex space-x-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div></div>';
+                this.chatMessages.appendChild(typingDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                return id;
+            }
+
+            removeTypingIndicator(id) {
+                const element = document.getElementById(id);
+                if (element) element.remove();
+            }
+        }
+
+        // Initialize chatbot when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new Chatbot();
+        });
+
+        // Prevent zoom on input focus (iOS Safari)
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
