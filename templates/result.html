@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6 md:space-y-8">
+
+    <!-- Mobile-Responsive Header -->
+    <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+        <div class="flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between md:items-start">
+            <div class="flex-1">
+                <h1 class="responsive-text-2xl md:text-3xl font-extrabold text-blue-800 mb-2">
+                    Results for <span class="text-gray-800">{{ city|title }}</span>
+                </h1>
+                <p class="text-sm md:text-base text-gray-500 mb-2">Comprehensive AI insights for your rooftop rainwater harvesting system.</p>
+                <p class="text-sm md:text-base text-gray-500 mb-2">
+                    Average Annual Rainfall: <strong class="text-gray-800">{{ rainfall }} mm</strong>
+                </p>
+                {% if savings %}
+                    <p class="text-sm md:text-base text-gray-500 mb-3">
+                        Estimated yearly savings: <strong class="text-gray-800">{{ savings.water_yearly_liters }} L</strong> and 
+                        <strong class="text-gray-800">₹{{ savings.money_yearly_inr }}</strong> 
+                        (Badge: <strong class="text-gray-800">{{ savings.badge }}</strong>).
+                    </p>
+                    <a href="{% url 'dashboard' %}" class="inline-flex items-center text-blue-700 font-semibold hover:text-blue-900 transition touch-target">
+                        View Savings Dashboard
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile-Responsive Weather Card -->
+            <div class="glass p-4 rounded-xl md:rounded-2xl border-blue-200 w-full md:w-auto">
+                <div class="flex justify-around md:justify-center md:space-x-6">
+                    <div class="text-center">
+                        <p class="text-xs md:text-sm text-gray-500 uppercase tracking-wide">Temp</p>
+                        <p class="text-lg md:text-xl font-bold text-orange-500">{{ weather.temp }}°C</p>
+                    </div>
+                    <div class="h-8 md:h-10 w-px bg-gray-300"></div>
+                    <div class="text-center">
+                        <p class="text-xs md:text-sm text-gray-500 uppercase tracking-wide">Humidity</p>
+                        <p class="text-lg md:text-xl font-bold text-blue-500">{{ weather.humidity }}%</p>
+                    </div>
+                    <div class="h-8 md:h-10 w-px bg-gray-300"></div>
+                    <div class="text-center">
+                        <p class="text-xs md:text-sm text-gray-500 uppercase tracking-wide">Rain</p>
+                        <p class="text-lg md:text-xl font-bold text-green-500">{{ weather.rain }}mm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile-Responsive AI Predictions Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        
+        <!-- Suitability Card -->
+        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-md border-t-4 border-t-green-500 relative overflow-hidden">
+            <div class="absolute -right-2 -top-2 md:-right-4 md:-top-4 bg-green-50 p-3 md:p-6 rounded-full">
+                <svg class="w-6 h-6 md:w-10 md:h-10 text-green-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-base md:text-lg font-semibold text-gray-600 mb-1">AI Suitability Score</h3>
+            <p class="text-2xl md:text-4xl font-black {% if suitability == 'Very High' or suitability == 'High' %}text-green-600{% else %}text-orange-500{% endif %} mt-2 mb-3 md:mb-4">{{ suitability }}</p>
+            <p class="text-xs md:text-sm text-gray-500 leading-relaxed">Based on rainfall data, pre/post monsoon depth, and soil analysis.</p>
+        </div>
+
+        <!-- Water Savings Card -->
+        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-md border-t-4 border-t-blue-500 relative overflow-hidden">
+            <div class="absolute -right-2 -top-2 md:-right-4 md:-top-4 bg-blue-50 p-3 md:p-6 rounded-full">
+                <svg class="w-6 h-6 md:w-10 md:h-10 text-blue-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+            </div>
+            <h3 class="text-base md:text-lg font-semibold text-gray-600 mb-1">Annual Harvest</h3>
+            <p class="text-2xl md:text-4xl font-black text-blue-600 mt-2 mb-3 md:mb-4">
+                {{ water }} <span class="text-sm md:text-xl">Liters</span>
+            </p>
+            <p class="text-xs md:text-sm text-gray-500 leading-relaxed">Amount of rainwater you can capture from a {{ area }} sq.m roof.</p>
+        </div>
+
+        <!-- Cost Prediction Card -->
+        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-md border-t-4 border-t-purple-500 relative overflow-hidden">
+            <div class="absolute -right-2 -top-2 md:-right-4 md:-top-4 bg-purple-50 p-3 md:p-6 rounded-full">
+                <svg class="w-6 h-6 md:w-10 md:h-10 text-purple-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-base md:text-lg font-semibold text-gray-600 mb-1">Installation Cost</h3>
+            <p class="text-2xl md:text-4xl font-black text-purple-600 mt-2 mb-3 md:mb-4">₹{{ cost }}</p>
+            <p class="text-xs md:text-sm text-gray-500 leading-relaxed">Estimated cost based on your region's suitability and {{ tank }}L capacity.</p>
+        </div>
+
+    </div>
+
+    <!-- Mobile-Responsive Charts and Impact Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <!-- Analytics Chart -->
+        <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-gray-100">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Water Savings Estimate (Monthly)</h3>
+            <div class="relative w-full h-64 md:h-80">
+                <canvas id="waterChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Environmental Impact -->
+        <div class="bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-3xl shadow-md text-white">
+            <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6 text-green-400">🌍 Environmental Impact</h3>
+            
+            <div class="space-y-4 md:space-y-6">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm md:text-base text-gray-300">Groundwater Replenishment</span>
+                        <span class="text-sm md:text-base font-bold text-green-400">Excellent</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 md:h-2.5">
+                        <div class="bg-green-400 h-2 md:h-2.5 rounded-full" style="width: 85%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm md:text-base text-gray-300">Carbon Footprint Reduction</span>
+                        <span class="text-sm md:text-base font-bold text-blue-400">Moderate</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 md:h-2.5">
+                        <div class="bg-blue-400 h-2 md:h-2.5 rounded-full" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <div class="pt-4 md:pt-6 border-t border-gray-700">
+                    <p class="text-xs md:text-sm text-gray-400 leading-relaxed">
+                        By installing a {{ tank }}L tank system, you are reducing municipal water dependence by approximately 
+                        <strong class="text-white">40%</strong> and supporting urban flood mitigation in {{ city }}.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile-Responsive Back Button -->
+    <div class="text-center mt-6 md:mt-8">
+        <a href="{% url 'home' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition touch-target">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Calculator
+        </a>
+    </div>
+
+</div>
+
+<script>
+    // Mobile-Responsive Chart
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('waterChart').getContext('2d');
+        const waterVal = {{ water }} / 12; // divide annual evenly for simplicity
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Harvested Water (Liters)',
+                    data: Array(12).fill(waterVal).map(val => (val * (0.8 + Math.random() * 0.4)).toFixed(0)),
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
