@@ -5,304 +5,481 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'core/savings_dashboard.css' %}">
+<style>
+/* Minimal Water-Themed Dashboard Styles */
+.dashboard-container {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}
+
+.hero-minimal {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+    border-radius: 20px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-minimal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(14, 165, 233, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0ea5e9, #06b6d4, #0891b2);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.water-icon { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; }
+.money-icon { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+.family-icon { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; }
+.eco-icon { background: linear-gradient(135deg, #0891b2, #0e7490); color: white; }
+
+.progress-bar-modern {
+    height: 10px;
+    background: rgba(14, 165, 233, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill-modern {
+    height: 100%;
+    background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 50%, #0891b2 100%);
+    border-radius: 10px;
+    transition: width 0.8s ease;
+    position: relative;
+}
+
+.progress-fill-modern::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.badge-section {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+    border-radius: 16px;
+    color: white;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(180deg); }
+}
+
+.chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(14, 165, 233, 0.1);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.08);
+}
+
+.water-button {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.water-button:hover {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.water-accent {
+    color: #0ea5e9;
+    font-weight: 600;
+}
+
+.impact-text {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.download-button {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.download-button:hover {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    transform: translateY(-1px);
+    color: white;
+    text-decoration: none;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6 md:space-y-8">
-    <!-- Mobile-Responsive Hero Section -->
-    <section class="savings-hero rain-pattern bg-gradient-to-r from-blue-600 to-cyan-500 relative rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-10 text-white overflow-hidden card-shadow">
-        <div class="relative z-10 max-w-3xl">
-            <h1 class="inline-block responsive-text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight bg-blue-900/35 px-3 md:px-4 py-2 rounded-xl md:rounded-2xl backdrop-blur-sm">
-                Rainwater Harvesting Savings Dashboard
-            </h1>
-            <p class="mt-3 inline-block text-white/95 text-sm bg-blue-900/25 px-3 py-1.5 rounded-xl backdrop-blur-sm">
-                Track your harvested water, money saved, and badge progress.
-            </p>
-            {% if latest %}
-                <p class="mt-4 inline-block text-xs text-white/90 bg-blue-900/20 px-3 py-1 rounded-xl backdrop-blur-sm">
-                    Last calculation: {{ latest.calculation_date|date:"M d, Y H:i" }} UTC
+<div class="dashboard-container">
+    <div class="max-w-7xl mx-auto px-4 space-y-8">
+        <!-- Clean Hero Section -->
+        <section class="hero-minimal p-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Water Savings Dashboard</h1>
+                    <p class="text-white/90">Track your environmental impact and savings</p>
+                </div>
+                {% if latest %}
+                    <div class="flex gap-3">
+                        <div class="bg-white/20 px-4 py-2 rounded-lg text-sm">
+                            Last updated: {{ latest.calculation_date|date:"M d, Y" }}
+                        </div>
+                    <a href="{% url 'analytics_download' %}"
+                       class="download-button">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download Report
+                    </a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if not latest %}
+            <div class="dashboard-card p-8 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">No calculations yet</h2>
+                <p class="text-gray-600 mb-6">Start by calculating your rainwater harvesting potential</p>
+                <a href="{% url 'home' %}#calculator" class="water-button">
+                    Start Calculating
+                </a>
+            </div>
+        {% else %}
+            <!-- Clean Stats Grid -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="stat-card">
+                    <div class="stat-icon water-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 font-medium">Water Saved</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ totals.water_yearly_liters_display }}</p>
+                    <p class="text-xs text-gray-500">Liters per year</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon money-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 font-medium">Money Saved</p>
+                    <p class="text-2xl font-bold text-gray-900">₹{{ totals.money_yearly_inr_display }}</p>
+                    <p class="text-xs text-gray-500">Per year</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon family-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 font-medium">Families Supported</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ families_supported }}</p>
+                    <p class="text-xs text-gray-500">For one month</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon eco-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 font-medium">Environmental Impact</p>
+                    <p class="text-2xl font-bold text-gray-900">High</p>
+                    <p class="text-xs text-gray-500">Positive impact</p>
+                </div>
+            </section>
+
+            <!-- Impact Statement -->
+            <div class="impact-text">
+                <p class="text-lg text-gray-700 font-medium">
+                    Your water harvesting system supports <span class="water-accent">{{ families_supported }} families</span> for a month
                 </p>
-            {% endif %}
-        </div>
-
-        <!-- Mobile-hidden decorative SVG -->
-        <div class="absolute -right-6 -bottom-10 opacity-40 sm:opacity-60 pointer-events-none select-none hidden md:block">
-            <svg class="w-[420px] h-[280px]" viewBox="0 0 520 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M120 232L258 138L396 232V320H120V232Z" fill="rgba(15,23,42,0.35)"/>
-                <path d="M165 320V238H235V320H165Z" fill="rgba(255,255,255,0.22)"/>
-                <path d="M372 180C372 153 394 131 421 131H472C499 131 521 153 521 180V320H372V180Z" fill="rgba(15,23,42,0.25)"/>
-                <path d="M387 182C387 163 403 147 422 147H471C490 147 506 163 506 182V205H387V182Z" fill="rgba(255,255,255,0.22)"/>
-                <path d="M77 92C95 70 110 55 110 38C110 58 130 79 130 92C130 103 121 112 110 112C89 112 77 103 77 92Z" fill="rgba(255,255,255,0.32)"/>
-                <path d="M20 130C35 112 48 99 48 84C48 101 64 118 64 130C64 139 56 146 48 146C34 146 20 139 20 130Z" fill="rgba(255,255,255,0.25)"/>
-                <path d="M310 78C326 59 338 45 338 30C338 46 356 63 356 78C356 87 349 94 338 94C322 94 310 87 310 78Z" fill="rgba(255,255,255,0.22)"/>
-            </svg>
-        </div>
-    </section>
-
-    {% if not latest %}
-        <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-200">
-            <h2 class="text-lg md:text-xl font-extrabold text-gray-800">No savings yet</h2>
-            <p class="mt-2 text-sm md:text-base text-gray-600">Run a calculation from the Home page to generate your first Water Savings report.</p>
-            <a href="{% url 'home' %}#calculator" class="inline-block mt-4 md:mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition touch-target">
-                Start Calculating
-            </a>
-        </div>
-    {% else %}
-        <!-- Mobile-Responsive Stats Grid -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 card-shadow">
-                <div class="flex items-start gap-3 md:gap-4">
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M12 2C9.2 6.1 6 10 6 14a6 6 0 0 0 12 0c0-4-3.2-7.9-6-12zm0 18a4 4 0 0 1-4-4c0-2.5 1.9-5.3 4-8.6 2.1 3.3 4 6.1 4 8.6a4 4 0 0 1-4 4z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-semibold text-slate-600">Total Water Saved</p>
-                        <p class="mt-1 md:mt-2 text-2xl md:text-4xl font-black text-slate-900 leading-none">{{ totals.water_yearly_liters_display }}</p>
-                        <p class="text-xs text-slate-500 mt-1">Liters</p>
-                    </div>
-                </div>
             </div>
 
-            <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 card-shadow">
-                <div class="flex items-start gap-3 md:gap-4">
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/>
-                        </svg>
+            <!-- Badge and Progress Section -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Badge Section -->
+                <div class="badge-section">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold">Current Achievement</h3>
+                        <div class="bg-white/20 px-3 py-1 rounded-lg text-sm">
+                            {{ totals.water_yearly_liters_display }} L
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-semibold text-slate-600">Monthly Savings</p>
-                        <p class="mt-1 md:mt-2 text-2xl md:text-4xl font-black text-slate-900 leading-none">₹{{ totals.money_monthly_inr_display }}</p>
-                        <p class="text-xs text-slate-500 mt-1">Estimated</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 card-shadow">
-                <div class="flex items-start gap-3 md:gap-4">
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M7 2a1 1 0 0 0-1 1v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3h-1V3a1 1 0 1 0-2 0v1H8V3a1 1 0 0 0-1-1zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-semibold text-slate-600">Yearly Savings</p>
-                        <p class="mt-1 md:mt-2 text-2xl md:text-4xl font-black text-slate-900 leading-none">₹{{ totals.money_yearly_inr_display }}</p>
-                        <p class="text-xs text-slate-500 mt-1">Estimated</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 card-shadow">
-                <div class="flex items-start gap-3 md:gap-4">
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M12 2c-3 2-6 5-6 9a6 6 0 0 0 12 0c0-4-3-7-6-9zm0 18a4 4 0 0 1-4-4c0-2.7 2.2-5.1 4-6.7 1.8 1.6 4 4 4 6.7a4 4 0 0 1-4 4z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs md:text-sm font-semibold text-slate-600">Money Saved</p>
-                        <p class="mt-1 md:mt-2 text-2xl md:text-4xl font-black text-slate-900 leading-none">₹{{ totals.money_yearly_inr_display }}</p>
-                        <p class="text-xs text-slate-500 mt-1">To date (latest run)</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Mobile-Responsive Impact Statement -->
-        <div class="flex flex-col md:flex-row items-center gap-4">
-            <div class="soft-divider flex-1 hidden md:block"></div>
-            <p class="text-sm md:text-base text-slate-700 text-center font-semibold px-4">
-                You have saved enough water to support <span class="text-slate-900 font-extrabold">{{ families_supported }}</span> families for a month.
-            </p>
-            <div class="soft-divider flex-1 hidden md:block"></div>
-        </div>
-
-        <!-- Mobile-Responsive Badge and Progress Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            <!-- Badge Card -->
-            <div class="bg-gradient-to-br from-blue-700 to-blue-950 text-white p-6 md:p-8 rounded-2xl md:rounded-3xl card-shadow">
-                <div class="flex items-center justify-between">
-                    <p class="text-white/80 text-sm font-semibold">Current Badge</p>
-                    <span class="text-xs bg-white/10 border border-white/20 px-2 md:px-3 py-1 rounded-full">{{ totals.water_yearly_liters_display }} L</span>
-                </div>
-
-                <div class="mt-6 md:mt-7 flex items-center gap-4 md:gap-5">
-                    <div class="w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-10 h-10 md:w-16 md:h-16" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M32 4C24 16 14 28 14 40c0 10 8 18 18 18s18-8 18-18C50 28 40 16 32 4z" fill="rgba(255,255,255,0.9)"/>
-                            <path d="M23 44c2.2 4.2 6.3 7 11 7 2.2 0 4.3-.6 6.2-1.7" stroke="rgba(30,64,175,0.75)" stroke-width="4" stroke-linecap="round"/>
-                            <circle cx="26" cy="38" r="3" fill="rgba(30,64,175,0.9)"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <h2 class="text-2xl md:text-4xl font-extrabold leading-none">{{ analysis.badge }}</h2>
-                        <p class="mt-2 text-white/80 text-sm">Unlocked at {{ analysis.current_badge_goal_liters }} liters saved</p>
-                    </div>
-                </div>
-
-                <div class="mt-6 md:mt-8 bg-white/10 border border-white/20 rounded-xl md:rounded-2xl p-3 md:p-4 text-sm">
-                    <p class="font-semibold">Inputs used</p>
-                    <p class="mt-2 text-white/80">Roof Area: {{ latest.roof_area }} m²</p>
-                    <p class="text-white/80">Rainfall: {{ latest.rainfall }} mm</p>
-                    <p class="text-white/80">Runoff: {{ latest.runoff_coefficient }}</p>
-                </div>
-
-                <p class="mt-4 md:mt-6 text-white/90 font-semibold">Keep it up, {{ analysis.badge }}!</p>
-            </div>
-
-            <!-- Progress and Charts Section -->
-            <div class="lg:col-span-2 space-y-4 md:space-y-6">
-                <!-- Progress Card -->
-                <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl border border-slate-200 card-shadow">
-                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                        </div>
                         <div>
-                            <h2 class="text-lg md:text-xl font-extrabold text-slate-800">Progress to Next Badge</h2>
-                            {% if analysis.next_badge %}
-                                <p class="mt-2 text-slate-600 text-sm">Next badge: <span class="font-semibold text-blue-700">{{ analysis.next_badge }}</span></p>
-                            {% else %}
-                                <p class="mt-2 text-slate-600 text-sm">You've reached the top badge. Keep saving water.</p>
-                            {% endif %}
-                        </div>
-                        <a href="{% url 'home' %}#calculator" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition touch-target text-sm">
-                            New Calculation
-                        </a>
-                    </div>
-
-                    {% if analysis.next_badge_goal_liters %}
-                        <div class="mt-6 flex justify-between text-sm text-slate-700">
-                            <span class="font-semibold">Goal: {{ analysis.next_badge_goal_liters }} Liters</span>
-                            <span>{{ totals.water_yearly_liters_raw }} L / {{ analysis.next_badge_goal_liters }} L</span>
-                        </div>
-                        <div class="mt-3 w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                            <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: {{ analysis.progress_to_next_pct }}%"></div>
-                        </div>
-                        <p class="mt-2 text-right text-sm text-blue-700 font-semibold">{{ analysis.progress_to_next_pct }}% to Goal</p>
-                    {% else %}
-                        <div class="mt-6 w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                            <div class="bg-emerald-600 h-3 rounded-full" style="width: 100%"></div>
-                        </div>
-                        <p class="mt-2 text-right text-sm text-emerald-700 font-semibold">100% achieved</p>
-                    {% endif %}
-                </div>
-
-                <!-- Mobile-Responsive Charts -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                    <div class="bg-white border border-slate-200 p-4 md:p-6 rounded-2xl md:rounded-3xl card-shadow">
-                        <h3 class="text-base md:text-lg font-extrabold text-slate-800">Monthly Water Savings</h3>
-                        <p class="mt-1 text-xs md:text-sm text-slate-600">Last 6 months (estimated).</p>
-                        <div class="mt-4 relative w-full h-48 md:h-64">
-                            <canvas id="monthlyWaterChart"></canvas>
+                            <h2 class="text-xl font-bold">{{ analysis.badge }}</h2>
+                            <p class="text-white/80 text-sm">Achieved at {{ analysis.current_badge_goal_liters|floatformat:0 }}L</p>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 p-4 md:p-6 rounded-2xl md:rounded-3xl card-shadow">
-                        <h3 class="text-base md:text-lg font-extrabold text-slate-800">Savings Breakdown</h3>
-                        <p class="mt-1 text-xs md:text-sm text-slate-600">Water bills vs other savings.</p>
-                        <div class="mt-4 grid grid-cols-5 gap-4 items-center">
-                            <div class="col-span-3">
-                                <div class="relative w-full aspect-square">
-                                    <canvas id="savingsBreakdownChart"></canvas>
-                                </div>
+                    <div class="bg-white/20 rounded-lg p-4">
+                        <p class="font-medium mb-3">System Details</p>
+                        <div class="space-y-2 text-sm text-white/90">
+                            <div class="flex justify-between">
+                                <span>Roof Area:</span>
+                                <span>{{ latest.roof_area }} m²</span>
                             </div>
-                            <div class="col-span-2 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
-                                    <span class="text-xs text-slate-600">Water Bills</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                                    <span class="text-xs text-slate-600">Other</span>
-                                </div>
+                            <div class="flex justify-between">
+                                <span>Annual Rainfall:</span>
+                                <span>{{ latest.rainfall }} mm</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Efficiency:</span>
+                                <span>{{ latest.runoff_coefficient|floatformat:1 }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        {{ chart.month_labels|json_script:"month-labels" }}
-        {{ chart.monthly_water|json_script:"monthly-water" }}
-        {{ chart.breakdown|json_script:"breakdown" }}
-    {% endif %}
+                <!-- Progress and Charts -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Progress Card -->
+                    <div class="dashboard-card p-6">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Progress to Next Badge</h3>
+                                {% if analysis.next_badge %}
+                                    <p class="text-gray-600">Next: {{ analysis.next_badge }}</p>
+                                {% else %}
+                                    <p class="text-gray-600">Maximum level achieved</p>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'home' %}#calculator" class="water-button text-sm">
+                                New Calculation
+                            </a>
+                        </div>
+
+                        {% if analysis.next_badge_goal_liters %}
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span>{{ totals.water_yearly_liters_raw }} L</span>
+                                    <span>{{ analysis.next_badge_goal_liters }} L</span>
+                                </div>
+                                <div class="progress-bar-modern">
+                                    <div class="progress-fill-modern" style="width: {{ analysis.progress_to_next_pct }}%"></div>
+                                </div>
+                                <p class="text-right text-sm text-indigo-600 font-medium mt-2">
+                                    {{ analysis.progress_to_next_pct }}% Complete
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="progress-bar-modern">
+                                <div class="progress-fill-modern" style="width: 100%"></div>
+                            </div>
+                            <p class="text-right text-sm text-green-600 font-medium mt-2">100% Achieved</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="chart-card">
+                            <h4 class="font-semibold text-gray-800 mb-4">Monthly Water Savings</h4>
+                            <div class="h-48">
+                                <canvas id="monthlyWaterChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h4 class="font-semibold text-gray-800 mb-4">Savings Breakdown</h4>
+                            <div class="h-48 flex items-center justify-center">
+                                <canvas id="savingsBreakdownChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {{ chart.month_labels|json_script:"month-labels" }}
+            {{ chart.monthly_water|json_script:"monthly-water" }}
+            {{ chart.breakdown|json_script:"breakdown" }}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 {% if latest %}
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     const monthLabels = JSON.parse(document.getElementById("month-labels").textContent);
     const monthlyWater = JSON.parse(document.getElementById("monthly-water").textContent);
     const breakdown = JSON.parse(document.getElementById("breakdown").textContent);
 
-    // Mobile-responsive chart configuration
-    const isMobile = window.innerWidth < 768;
-    const fontSize = isMobile ? 10 : 12;
-
-    new Chart(document.getElementById("monthlyWaterChart").getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: monthLabels,
-        datasets: [{
-          label: "Liters saved",
-          data: monthlyWater,
-          backgroundColor: "rgba(37, 99, 235, 0.45)",
-          borderColor: "rgb(37, 99, 235)",
-          borderWidth: 1,
-          borderRadius: 10,
-          maxBarThickness: isMobile ? 30 : 42,
-        }],
-      },
-      options: {
+    // Clean, minimal chart configuration
+    const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { 
-          legend: { 
-            display: !isMobile,
-            labels: { font: { size: fontSize } }
-          } 
+            legend: { display: false }
         },
         scales: {
-          y: { 
-            ticks: { 
-              color: "#334155",
-              font: { size: fontSize }
-            }, 
-            grid: { color: "rgba(148,163,184,0.35)" } 
-          },
-          x: { 
-            ticks: { 
-              color: "#334155",
-              font: { size: fontSize }
-            }, 
-            grid: { display: false } 
-          },
+            y: { 
+                ticks: { 
+                    color: "#64748b",
+                    font: { size: 11 }
+                }, 
+                grid: { color: "rgba(148,163,184,0.2)" },
+                border: { display: false }
+            },
+            x: { 
+                ticks: { 
+                    color: "#64748b",
+                    font: { size: 11 }
+                }, 
+                grid: { display: false },
+                border: { display: false }
+            },
         },
-      },
+    };
+
+    // Monthly Water Chart - Water-themed bars
+    new Chart(document.getElementById("monthlyWaterChart").getContext("2d"), {
+        type: "bar",
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                label: "Liters saved",
+                data: monthlyWater,
+                backgroundColor: "#0ea5e9",
+                borderRadius: 6,
+                maxBarThickness: 32,
+            }],
+        },
+        options: chartOptions,
     });
 
+    // Savings Breakdown Chart - Water-themed donut
     new Chart(document.getElementById("savingsBreakdownChart").getContext("2d"), {
-      type: "doughnut",
-      data: {
-        labels: ["Water Bills", "Other Savings"],
-        datasets: [{
-          data: breakdown,
-          backgroundColor: ["rgb(37, 99, 235)", "rgb(16, 185, 129)"],
-          borderColor: "rgba(255,255,255,0.9)",
-          borderWidth: 2,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: "70%",
-        plugins: { legend: { display: false } },
-      },
+        type: "doughnut",
+        data: {
+            labels: ["Water Bills", "Other Savings"],
+            datasets: [{
+                data: breakdown,
+                backgroundColor: ["#0ea5e9", "#06b6d4"],
+                borderWidth: 0,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "65%",
+            plugins: { legend: { display: false } },
+        },
     });
-  });
+});
 </script>
 {% endif %}
 {% endblock %}

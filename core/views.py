@@ -41,11 +41,15 @@ def analytics(request):
 
 def analytics_download(request):
     now = datetime.now(timezone.utc)
-    filename = f"jalnidhi_analytics_report_{now.strftime('%Y%m%d_%H%M%S')}Z.csv"
+    filename = f"jalnidhi_personal_report_{now.strftime('%Y%m%d_%H%M%S')}Z.csv"
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
+    # Get user's calculation data
+    actor_filter, _ = _get_actor_filter(request)
+    latest = UserWaterSavings.objects.filter(**actor_filter).order_by("-calculation_date").first()
+    
     lines = []
     def w(row):
         output = []
@@ -56,27 +60,62 @@ def analytics_download(request):
             output.append(text)
         lines.append(",".join(output))
 
-    w(["JalNidhi AI Analytics Report"])
+    w(["JalNidhi AI - Personal Water Savings Report"])
     w(["Generated (UTC)", now.isoformat()])
     w([])
 
-    w(["KPI", "Value"])
-    w(["Total Systems Calculated (demo)", 1245])
-    w(["Avg Cost Prediction (demo, INR)", 48500])
-    w(["Total Liters Secured (demo)", "2.4B"])
-    w(["Active Cities (demo)", 18])
-    w([])
-
-    w(["Cost vs Tank Capacity (demo)"])
-    w(["Tank Capacity", "Avg Predicted Cost (INR)"])
-    for cap, cost in [("1000L", 12000), ("2000L", 24000), ("3000L", 31000), ("5000L", 48500), ("10000L", 85000), ("15000L", 115000)]:
-        w([cap, cost])
-    w([])
-
-    w(["Suitability Distribution (demo)"])
-    w(["Label", "Share (%)"])
-    for label, share in [("Very High", 45), ("High", 25), ("Moderate/Low", 20), ("Very Low", 10)]:
-        w([label, share])
+    if latest:
+        # Calculate analysis data
+        analysis = analyze_savings(latest.roof_area, latest.rainfall, latest.runoff_coefficient)
+        
+        w(["Personal Calculation Summary"])
+        w(["Calculation Date", latest.calculation_date.isoformat()])
+        w(["Roof Area (sqm)", latest.roof_area])
+        w(["Annual Rainfall (mm)", latest.rainfall])
+        w(["Runoff Coefficient", latest.runoff_coefficient])
+        w([])
+        
+        w(["Water Savings Results"])
+        w(["Annual Water Saved (Liters)", f"{analysis.water_yearly_liters:,.1f}"])
+        w(["Monthly Water Saved (Liters)", f"{analysis.water_monthly_liters:,.1f}"])
+        w(["Annual Money Saved (INR)", f"{analysis.money_yearly_inr:,.2f}"])
+        w(["Monthly Money Saved (INR)", f"{analysis.money_monthly_inr:,.2f}"])
+        w(["Current Badge", analysis.badge])
+        w(["Progress to Next Badge (%)", f"{analysis.progress_to_next_pct}%"])
+        w([])
+        
+        w(["Environmental Impact"])
+        families_supported = max(1, int(analysis.water_yearly_liters / 21600))  # 21,600L per family per month
+        w(["Families Supported (1 month)", families_supported])
+        w(["CO2 Reduction (kg/year)", f"{analysis.water_yearly_liters * 0.0005:,.1f}"])  # Approx 0.5g CO2 per liter
+        w(["Groundwater Recharge (Liters)", f"{analysis.water_yearly_liters * 0.6:,.1f}"])  # 60% recharge rate
+        w([])
+        
+        w(["Monthly Breakdown (Last 6 Months Projection)"])
+        w(["Month", "Projected Water Saved (Liters)"])
+        month_abbr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        today = datetime.now(timezone.utc).date()
+        base_monthly = float(analysis.water_monthly_liters)
+        weights = [0.6, 0.75, 0.9, 1.0, 1.15, 1.3]
+        
+        for i, weight in enumerate(weights):
+            month_delta = i - 5
+            month_num = (today.month + month_delta - 1) % 12 + 1
+            month_name = month_abbr[month_num - 1]
+            projected_water = round(base_monthly * weight, 1)
+            w([month_name, f"{projected_water:,.1f}"])
+        
+    else:
+        w(["No Calculation Data Available"])
+        w(["Please complete a calculation on the home page first"])
+        w(["Visit: Home > Calculator > Fill Details > Calculate"])
+        w([])
+        w(["Sample Benefits of Rainwater Harvesting"])
+        w(["Water Bill Reduction", "40-70%"])
+        w(["Groundwater Recharge", "40-60% increase"])
+        w(["Flood Reduction", "30-50% in urban areas"])
+        w(["Property Value Increase", "3-5%"])
+        w(["Payback Period", "2-5 years"])
 
     response.write("\n".join(lines))
     return response

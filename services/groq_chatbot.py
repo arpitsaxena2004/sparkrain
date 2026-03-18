@@ -9,19 +9,27 @@ from .water_savings import BADGE_LEVELS, WATER_COST_PER_LITER_INR
 
 class GroqRainwaterChatbot:
     def __init__(self):
-        # Initialize Groq client
-        self.groq_api_key = os.getenv('GROQ_API_KEY')
-        if not self.groq_api_key:
-            self.groq_api_key = None  # Will fallback to rule-based responses
-            print("Warning: GROQ_API_KEY not found. Using fallback responses.")
+        # Initialize Groq client using hardcoded API key from Django settings
+        self.groq_api_key = getattr(settings, 'GROQ_API_KEY', None)
+        self.chatbot_config = getattr(settings, 'CHATBOT_CONFIG', {})
+        
+        # Check if API key is properly configured
+        if not self.groq_api_key or self.groq_api_key == 'your-groq-api-key-here':
+            self.groq_api_key = None
+            print("⚠️  WARNING: Please replace 'your-groq-api-key-here' with your actual Groq API key in settings.py")
+            print("   Location: rainwater_ai/settings.py - Line with GROQ_API_KEY")
+            print("   Currently using fallback responses instead of AI")
+            print("   Get your API key from: https://console.groq.com/")
+            print("   For better responses, add your API key and restart the server")
         
         self.client = None
         if self.groq_api_key:
             try:
                 self.client = Groq(api_key=self.groq_api_key)
-                print("Groq client initialized successfully!")
+                print("✅ Groq client initialized successfully!")
             except Exception as e:
-                print(f"Error initializing Groq client: {e}")
+                print(f"❌ Error initializing Groq client: {e}")
+                print("   Please check if your API key is valid")
                 self.client = None
         
         # System prompt with comprehensive knowledge about rainwater harvesting
@@ -111,8 +119,19 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
             return None
 
     def get_fallback_response(self, message: str) -> str:
-        """Fallback responses when Groq API is not available"""
+        """Enhanced fallback responses when Groq API is not available"""
         message_lower = message.lower()
+        
+        # Import rainfall data for better responses
+        from .rainwater_calculator import RAINFALL_MAP, VALID_DISTRICTS
+        
+        # Check for specific district mentions
+        district_mentioned = None
+        if RAINFALL_MAP:
+            for district in list(RAINFALL_MAP.keys())[:50]:  # Check top 50 districts
+                if district.lower() in message_lower:
+                    district_mentioned = district
+                    break
         
         # Simple keyword-based responses
         if any(word in message_lower for word in ['hello', 'hi', 'hey']):
@@ -121,8 +140,16 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
         elif any(word in message_lower for word in ['cost', 'price', 'money']):
             return "💰 **Rainwater Harvesting Costs**:\n\n• Small systems (50-100 sqm): ₹15,000-30,000\n• Medium systems (100-200 sqm): ₹30,000-75,000\n• Large systems (200+ sqm): ₹75,000-1,50,000\n\nPayback period is typically 2-5 years. Use our calculator for personalized estimates!"
         
-        elif any(word in message_lower for word in ['rainfall', 'rain', 'data']):
-            return "🌧️ **Rainfall Information**:\n\nI have rainfall data for 600+ Indian districts! India's average rainfall is 1,200mm/year, varying from 313mm (Rajasthan) to 11,871mm (Meghalaya).\n\nYour roof can collect ~0.8 liters per sqm per mm of rainfall. Which district are you interested in?"
+        elif any(word in message_lower for word in ['rainfall', 'rain', 'data']) or district_mentioned:
+            if district_mentioned and RAINFALL_MAP:
+                rainfall = RAINFALL_MAP.get(district_mentioned, 'Data not available')
+                if isinstance(rainfall, (int, float)):
+                    water_potential = rainfall * 0.8
+                    return f"🌧️ **{district_mentioned.title()} Rainfall Data**:\n\n• **Annual Rainfall**: {rainfall} mm\n• **Water Collection Potential**: {water_potential:.0f} L per sqm of roof\n• **For 100 sqm roof**: {water_potential * 100:,.0f} L/year\n• **Estimated Value**: ₹{water_potential * 100 * 0.05:,.0f}/year\n\nThis data is used in our suitability calculations!"
+                else:
+                    return f"🌧️ **{district_mentioned.title()}**: Rainfall data not available in our database.\n\nI have data for 600+ Indian districts. Try major cities like Mumbai, Delhi, Bangalore, Chennai, Pune, Hyderabad, etc."
+            else:
+                return "🌧️ **Rainfall Information**:\n\nI have rainfall data for 600+ Indian districts! India's average rainfall is 1,200mm/year, varying from 313mm (Rajasthan) to 11,871mm (Meghalaya).\n\nYour roof can collect ~0.8 liters per sqm per mm of rainfall. Which district are you interested in? Try: Mumbai, Delhi, Bangalore, Chennai, Pune..."
         
         elif any(word in message_lower for word in ['benefit', 'advantage', 'why']):
             return "🌍 **Benefits of Rainwater Harvesting**:\n\n• 💰 Reduce water bills by 40-70%\n• 🌱 Recharge groundwater by 40-60%\n• 🌊 Reduce urban flooding by 30-50%\n• 🏠 Increase property value by 3-5%\n• ♻️ Reduce carbon footprint by 0.5-1 ton CO₂/year\n\nIt's a win-win for your wallet and the environment!"
@@ -137,7 +164,7 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
             return "Thank you for using JalNidhi AI! Remember, every drop counts in water conservation. Feel free to ask me anything about rainwater harvesting anytime! 💧🌍"
         
         else:
-            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\nWhat would you like to know?"
+            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data for 600+ districts\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\n**Note**: For best AI responses, please add your Groq API key in settings.py\n\nWhat would you like to know?"
 
     def get_response(self, message: str, user_context: Dict = None) -> str:
         """Main method to get chatbot response"""
