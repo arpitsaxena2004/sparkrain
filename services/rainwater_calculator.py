@@ -33,15 +33,26 @@ def get_district_rainfall(city: str):
     city_clean = extract_base_district(city)
     return RAINFALL_MAP.get(city_clean, None)
 
-# Load ML models
-try:
-    suitability_model = joblib.load(os.path.join(BASE, 'suitability_model.pkl'))
-    scaler            = joblib.load(os.path.join(BASE, 'scaler.pkl'))
-    encoder           = joblib.load(os.path.join(BASE, 'encoder.pkl'))
-    cost_model        = joblib.load(os.path.join(BASE, 'cost_model.pkl'))
-    cost_encoder      = joblib.load(os.path.join(BASE, 'cost_encoder.pkl'))
-except Exception as e:
-    print(f"Warning: model load error: {e}")
+# Load ML models lazily
+suitability_model = None
+scaler = None
+encoder = None
+cost_model = None
+cost_encoder = None
+
+def _load_ml_models():
+    """Lazy load heavy ML models to save RAM globally."""
+    global suitability_model, scaler, encoder, cost_model, cost_encoder
+    if cost_model is not None:
+        return
+    try:
+        suitability_model = joblib.load(os.path.join(BASE, 'suitability_model.pkl'))
+        scaler            = joblib.load(os.path.join(BASE, 'scaler.pkl'))
+        encoder           = joblib.load(os.path.join(BASE, 'encoder.pkl'))
+        cost_model        = joblib.load(os.path.join(BASE, 'cost_model.pkl'))
+        cost_encoder      = joblib.load(os.path.join(BASE, 'cost_encoder.pkl'))
+    except Exception as e:
+        print(f"Warning: model load error: {e}")
 
 
 def validate_district(city: str):
@@ -82,6 +93,8 @@ def predict_suitability_and_cost(soil_type, rainfall, rooftop_area, tank_capacit
     Run both ML models and return results dict.
     Call only AFTER validate_district and validate_inputs pass.
     """
+    _load_ml_models()
+    
     # Suitability model
     soil_encoded = encoder.transform([soil_type])[0]
     pre_monsoon_depth  = 5.0   # default — add as form field later if needed
