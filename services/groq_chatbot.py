@@ -16,8 +16,9 @@ class GroqRainwaterChatbot:
         # Check if API key is properly configured
         if not self.groq_api_key or self.groq_api_key == 'your-groq-api-key-here':
             self.groq_api_key = None
-            print("⚠️  WARNING: Please replace 'your-groq-api-key-here' with your actual Groq API key in settings.py")
-            print("   Location: rainwater_ai/settings.py - Line with GROQ_API_KEY")
+            print("⚠️  WARNING: Groq API key not configured properly")
+            print("   For local development: Add GROQ_API_KEY to .env file")
+            print("   For production: Set GROQ_API_KEY environment variable")
             print("   Currently using fallback responses instead of AI")
             print("   Get your API key from: https://console.groq.com/")
             print("   For better responses, add your API key and restart the server")
@@ -164,7 +165,7 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
             return "Thank you for using JalNidhi AI! Remember, every drop counts in water conservation. Feel free to ask me anything about rainwater harvesting anytime! 💧🌍"
         
         else:
-            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data for 600+ districts\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\n**Note**: For best AI responses, please add your Groq API key in settings.py\n\nWhat would you like to know?"
+            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data for 600+ districts\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\n**Note**: For best AI responses, set GROQ_API_KEY environment variable\n\nWhat would you like to know?"
 
     def get_response(self, message: str, user_context: Dict = None) -> str:
         """Main method to get chatbot response"""

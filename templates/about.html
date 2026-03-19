@@ -3,52 +3,52 @@
 {% block title %}About | JalNidhi AI{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto space-y-10">
-    <section class="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-10 text-white shadow-2xl overflow-hidden relative">
+<div class="max-w-5xl mx-auto space-y-6 md:space-y-10">
+    <section class="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl md:rounded-2xl p-6 md:p-10 text-white shadow-2xl overflow-hidden relative animate-slide-right">
         <div class="relative z-10 max-w-3xl">
-            <h1 class="text-4xl lg:text-5xl font-extrabold leading-tight">About JalNidhi AI</h1>
-            <p class="mt-4 text-lg opacity-90">
+            <h1 class="responsive-text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">About JalNidhi AI</h1>
+            <p class="mt-4 text-base md:text-lg opacity-90">
                 JalNidhi AI is an AI-powered rooftop rainwater harvesting assistant that estimates water capture potential,
                 predicts installation cost, and suggests site suitability for Indian districts.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
-                <a href="{% url 'home' %}#calculator" class="bg-white text-blue-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100 transition">
+                <a href="{% url 'home' %}#calculator" class="bg-white text-blue-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100 transition touch-target">
                     Try the Calculator
                 </a>
-                <a href="{% url 'dashboard' %}" class="bg-blue-700/40 border border-white/30 px-6 py-3 rounded-full font-bold hover:bg-blue-700/60 transition">
+                <a href="{% url 'dashboard' %}" class="bg-blue-700/40 border border-white/30 px-6 py-3 rounded-full font-bold hover:bg-blue-700/60 transition touch-target">
                     View Dashboard
                 </a>
             </div>
         </div>
-        <div class="absolute right-0 bottom-0 opacity-20 transform translate-x-1/4 translate-y-1/4">
-            <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2C6.666 2 4.333 4.333 4 7c-.551 4.411-4 8-4 8v1h20v-1s-3.449-3.589-4-8c-.333-2.667-2.666-5-6-5z"></path></svg>
+        <div class="absolute right-0 bottom-0 opacity-20 transform translate-x-1/4 translate-y-1/4 hidden md:block">
+            <svg class="w-64 md:w-96 h-64 md:h-96" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2C6.666 2 4.333 4.333 4 7c-.551 4.411-4 8-4 8v1h20v-1s-3.449-3.589-4-8c-.333-2.667-2.666-5-6-5z"></path></svg>
         </div>
     </section>
 
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-lg font-bold text-gray-800">Water Potential</h2>
-            <p class="mt-2 text-gray-600">
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-200 animate-on-scroll animate-delay-1">
+            <h2 class="text-base md:text-lg font-bold text-gray-800">Water Potential</h2>
+            <p class="mt-2 text-sm md:text-base text-gray-600">
                 Estimates the rainwater you can capture based on rooftop area, annual rainfall, and runoff factor.
             </p>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-lg font-bold text-gray-800">AI Suitability</h2>
-            <p class="mt-2 text-gray-600">
+        <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-200 animate-on-scroll animate-delay-2">
+            <h2 class="text-base md:text-lg font-bold text-gray-800">AI Suitability</h2>
+            <p class="mt-2 text-sm md:text-base text-gray-600">
                 Uses a clustering model to categorize your site suitability using rainfall and soil type signals.
             </p>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-lg font-bold text-gray-800">Cost Prediction</h2>
-            <p class="mt-2 text-gray-600">
+        <div class="bg-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-200 animate-on-scroll animate-delay-3">
+            <h2 class="text-base md:text-lg font-bold text-gray-800">Cost Prediction</h2>
+            <p class="mt-2 text-sm md:text-base text-gray-600">
                 Predicts approximate installation cost using a trained model with inputs like suitability, tank size, and area.
             </p>
         </div>
     </section>
 
-    <section class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 lg:p-10 space-y-6">
-        <h2 class="text-2xl font-extrabold text-gray-800">How it works</h2>
-        <ol class="space-y-4 text-gray-700 list-decimal list-inside">
+    <section class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-200 p-6 md:p-8 lg:p-10 space-y-6 animate-on-scroll">
+        <h2 class="responsive-text-2xl font-extrabold text-gray-800">How it works</h2>
+        <ol class="space-y-4 text-sm md:text-base text-gray-700 list-decimal list-inside">
             <li>
                 <span class="font-semibold">District validation:</span>
                 only Indian districts present in the training dataset are accepted (with typo suggestions).
@@ -59,37 +59,37 @@
             </li>
             <li>
                 <span class="font-semibold">ML inference:</span>
-                predicts suitability and cost using pre-trained models stored in <code class="px-1 py-0.5 bg-gray-100 rounded">ml_models/</code>.
+                predicts suitability and cost using pre-trained models stored in <code class="px-1 py-0.5 bg-gray-100 rounded text-sm">ml_models/</code>.
             </li>
             <li>
                 <span class="font-semibold">Water calculation:</span>
                 estimates captured water using rooftop area × rainfall × runoff factor.
             </li>
         </ol>
-        <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5 text-blue-900">
-            <p class="font-semibold">Note</p>
-            <p class="mt-1 text-sm">
+        <div class="rounded-xl md:rounded-2xl bg-blue-50 border border-blue-100 p-4 md:p-5 text-blue-900">
+            <p class="font-semibold text-sm md:text-base">Note</p>
+            <p class="mt-1 text-xs md:text-sm">
                 Predictions are estimates to support planning and awareness. For final design, consult local guidelines and a qualified professional.
             </p>
         </div>
     </section>
 
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-extrabold text-gray-800">Key inputs</h2>
-            <ul class="mt-4 space-y-2 text-gray-700 list-disc list-inside">
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-200 animate-on-scroll animate-delay-1">
+            <h2 class="text-lg md:text-xl font-extrabold text-gray-800">Key inputs</h2>
+            <ul class="mt-4 space-y-2 text-sm md:text-base text-gray-700 list-disc list-inside">
                 <li>Rooftop area (sq meters)</li>
                 <li>Annual rainfall (mm)</li>
                 <li>Soil type (Loamy/Clay/Sandy/Rocky)</li>
                 <li>Preferred tank capacity (liters)</li>
             </ul>
         </div>
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-extrabold text-gray-800">Built with</h2>
-            <ul class="mt-4 space-y-2 text-gray-700 list-disc list-inside">
+        <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-sm border border-gray-200 animate-on-scroll animate-delay-2">
+            <h2 class="text-lg md:text-xl font-extrabold text-gray-800">Built with</h2>
+            <ul class="mt-4 space-y-2 text-sm md:text-base text-gray-700 list-disc list-inside">
                 <li>Django web app with Tailwind UI</li>
                 <li>Scikit-learn models (KMeans + RandomForest)</li>
-                <li>Joblib for model persistence</li>
+                <li>Groq LLM API (LLaMA 3.1 70B) for AI Chatbot</li>
                 <li>OpenWeatherMap API for live weather context</li>
             </ul>
         </div>

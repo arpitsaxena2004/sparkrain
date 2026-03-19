@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>{% block title %}AI Rainwater Harvesting{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'core/jalnidhi-logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block extra_head %}{% endblock %}
@@ -39,15 +44,72 @@
         .responsive-text-2xl { font-size: clamp(1.25rem, 5vw, 1.5rem); }
         .responsive-text-3xl { font-size: clamp(1.5rem, 6vw, 1.875rem); }
         .responsive-text-4xl { font-size: clamp(1.875rem, 7vw, 2.25rem); }
+
+        /* Entrance Animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-on-scroll.animate-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .animate-delay-1 { transition-delay: 0.1s; }
+        .animate-delay-2 { transition-delay: 0.2s; }
+        .animate-delay-3 { transition-delay: 0.3s; }
+        .animate-delay-4 { transition-delay: 0.4s; }
+
+        /* Fade in from left */
+        .animate-slide-right {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-slide-right.animate-visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Scale fade */
+        .animate-scale-in {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .animate-scale-in.animate-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Chatbot quick replies */
+        .quick-reply-btn {
+            display: inline-block;
+            padding: 6px 14px;
+            margin: 3px;
+            border: 1.5px solid #3b82f6;
+            border-radius: 20px;
+            color: #3b82f6;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        .quick-reply-btn:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+<body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden" style="font-family: 'Inter', sans-serif;">
     <!-- Mobile-First Navbar -->
     <nav class="bg-blue-600 shadow-lg text-white sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-3 md:py-4">
-                <a href="{% url 'home' %}" class="responsive-text-xl font-bold flex items-center gap-2">
-                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                <a href="{% url 'home' %}" class="responsive-text-xl font-bold flex items-center gap-3">
+                    <img src="{% static 'core/jalnidhi-logo.png' %}" alt="JalNidhi Logo" class="h-10 md:h-12 w-auto object-contain rounded-full bg-white p-0.5 shadow-sm">
                     <span class="hidden sm:inline">JalNidhi AI</span>
                     <span class="sm:hidden">JalNidhi</span>
                 </a>
@@ -121,7 +183,13 @@
             <!-- Chat Messages -->
             <div id="chat-messages" class="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 text-sm">
                 <div class="bg-blue-50 p-3 rounded-lg">
-                    <p class="text-sm">Hello! I'm your rainwater harvesting assistant. I can help you with calculations, explain results, or answer questions. How can I help you today?</p>
+                    <p class="text-sm">Hello! I'm JalNidhi AI 🌧️ — your rainwater harvesting assistant. How can I help you today?</p>
+                </div>
+                <div id="quick-replies" class="flex flex-wrap gap-1 px-1">
+                    <button class="quick-reply-btn" onclick="sendQuickReply('How does rainwater harvesting work?')">💧 How it works</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('What is the cost of installation?')">💰 Cost info</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('What are the benefits?')">🌍 Benefits</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('Help me use the calculator')">🧮 Calculator</button>
                 </div>
             </div>
 
@@ -294,8 +362,34 @@
         }
 
         // Initialize chatbot when DOM is loaded
+        let chatbotInstance;
         document.addEventListener('DOMContentLoaded', () => {
-            new Chatbot();
+            chatbotInstance = new Chatbot();
+        });
+
+        // Quick reply handler
+        function sendQuickReply(message) {
+            const quickReplies = document.getElementById('quick-replies');
+            if (quickReplies) quickReplies.remove();
+            if (chatbotInstance) {
+                chatbotInstance.chatInput.value = message;
+                chatbotInstance.sendMessage();
+            }
+        }
+
+        // Intersection Observer for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-on-scroll, .animate-slide-right, .animate-scale-in').forEach(el => {
+                observer.observe(el);
+            });
         });
 
         // Prevent zoom on input focus (iOS Safari)
