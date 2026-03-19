@@ -30,7 +30,7 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Edit .env file and add your API keys:
-# - Get GROQ API key from https://console.groq.com/
+# - Get OPENAI API key from https://platform.openai.com/
 # - Add your Django secret key
 ```
 
@@ -48,13 +48,13 @@ Visit `http://127.0.0.1:8000/` to access the application.
 
 ## 🔑 API Keys Required
 
-### GROQ API Key (for AI Chatbot)
-1. Visit [https://console.groq.com/](https://console.groq.com/)
+### OpenAI API Key (for AI Chatbot)
+1. Visit [https://platform.openai.com/](https://platform.openai.com/)
 2. Create a free account
 3. Generate an API key
-4. Add it to your `.env` file as `GROQ_API_KEY=your_key_here`
+4. Add it to your `.env` file as `OPENAI_API_KEY=your_key_here`
 
-**Note**: Without the GROQ API key, the chatbot will use fallback responses with limited functionality.
+**Note**: Without the OpenAI API key, the chatbot will use fallback responses with limited functionality.
 
 ## 📁 Project Structure
 

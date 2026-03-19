@@ -1,4 +1,4 @@
-﻿asgiref==3.11.1
+asgiref==3.11.1
 certifi==2026.2.25
 charset-normalizer==3.4.5
 dj-database-url==3.1.2
@@ -23,7 +23,7 @@ tzdata==2025.3
 urllib3==2.6.3
 whitenoise==6.12.0
 nltk==3.9.1
-groq==0.11.0
+openai>=1.0.0
 psycopg2-binary==2.9.9
 httpx==0.27.2
 

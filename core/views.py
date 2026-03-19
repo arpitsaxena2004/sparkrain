@@ -15,7 +15,7 @@ from services.rainwater_calculator import (
 )
 from services.weather_api import get_weather
 from services.water_savings import analyze_savings
-from services.groq_chatbot import groq_chatbot
+from services.openai_chatbot import chatbot
 
 
 def _get_actor_filter(request):
@@ -387,7 +387,7 @@ def chatbot_api(request):
         
         # Get chatbot response
         try:
-            response = groq_chatbot.get_response(message, user_context)
+            response = chatbot.get_response(message, user_context)
         except Exception as e:
             # Fallback response if chatbot fails
             response = "I'm sorry, I encountered an error processing your message. Please try asking your question in a different way."

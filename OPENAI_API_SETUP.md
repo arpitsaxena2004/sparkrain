@@ -1,23 +1,19 @@
-# Groq API Key Setup Instructions
+# OpenAI API Key Setup Instructions
 
-## Step 1: Get Your Groq API Key
+## Step 1: Get Your OpenAI API Key
 
-1. Go to [https://console.groq.com/](https://console.groq.com/)
+1. Go to [https://platform.openai.com/](https://platform.openai.com/)
 2. Sign up or log in to your account
-3. Navigate to API Keys section
-4. Create a new API key
-5. Copy the API key (it will look like: `gsk_...`)
+3. Navigate to API Keys section (Dashboard -> API Keys)
+4. Create a new secret API key
+5. Copy the API key (it will look like: `sk-proj-...`)
 
 ## Step 2: Add API Key to Code
 
-1. Open the file: `rainwater_ai/settings.py`
-2. Find this line (around line 120):
-   ```python
-   GROQ_API_KEY = 'your-groq-api-key-here'  # ← PASTE YOUR GROQ API KEY HERE
-   ```
-3. Replace `'your-groq-api-key-here'` with your actual API key:
-   ```python
-   GROQ_API_KEY = 'gsk_your_actual_api_key_here'
+1. In your project root folder `d:\Projects\RoofTop_Rainwater_Harvesting-main\`, open or create a file named `.env`.
+2. Add the following line to the file, replacing `your_actual_key_here` with the copied key:
+   ```env
+   OPENAI_API_KEY=sk-proj-your_actual_key_here
    ```
 
 ## Step 3: Test the Configuration
@@ -28,7 +24,7 @@ python manage.py test_chatbot
 ```
 
 You should see:
-- ✅ Groq client initialized successfully
+- ✅ OpenAI client initialized successfully
 - ✅ Chatbot response received
 - A sample response from the AI
 
@@ -46,10 +42,11 @@ The chatbot will now be available on your website with AI-powered responses!
 - Make sure you replaced the placeholder text with your actual API key
 - Check that there are no extra spaces or quotes
 
-### If you see "❌ Groq client failed to initialize":
+### If you see "❌ OpenAI client failed to initialize" or API errors:
 - Verify your API key is correct
+- Ensure you have a funded billing account on OpenAI ($5 minimum credit usually required)
 - Check your internet connection
-- Make sure the `groq` package is installed: `pip install groq`
+- Make sure the `openai` package is installed: `pip install openai`
 
 ### If chatbot falls back to simple responses:
 - The system will automatically use rule-based responses if the API fails
@@ -57,15 +54,14 @@ The chatbot will now be available on your website with AI-powered responses!
 
 ## Security Note
 
-Since the API key is hardcoded, make sure:
-- Don't commit this code to public repositories
+- Don't commit this code (`.env` file) to public repositories
 - Keep your API key secure
-- Consider using environment variables for production deployment
+- Use environment variables for production deployment (like Render)
 
 ## API Usage
 
 The chatbot uses:
-- Model: `llama-3.1-70b-versatile`
+- Model: `gpt-4o-mini`
 - Max tokens: 500 per response
 - Temperature: 0.7 (balanced creativity)
 

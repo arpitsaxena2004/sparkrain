@@ -4,7 +4,7 @@
 
 1. **GitHub Repository**: Your code should be pushed to GitHub
 2. **Render Account**: Sign up at [render.com](https://render.com)
-3. **Groq API Key**: Get from [console.groq.com](https://console.groq.com)
+3. **OpenAI API Key**: Get from [platform.openai.com](https://platform.openai.com)
 
 ## 🔧 Step-by-Step Deployment
 
@@ -34,7 +34,7 @@
 In Render dashboard, go to **Environment** tab and add:
 
 ```
-GROQ_API_KEY=your-actual-groq-api-key-here
+OPENAI_API_KEY=your-actual-openai-api-key-here
 DEBUG=False
 ALLOWED_HOSTS=your-app-name.onrender.com,localhost
 SECRET_KEY=your-production-secret-key-here
@@ -64,7 +64,7 @@ SECRET_KEY=your-production-secret-key-here
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `GROQ_API_KEY` | Your Groq API key | `gsk_abc123...` |
+| `OPENAI_API_KEY` | Your OpenAI API key | `sk-abc123...` |
 | `DEBUG` | Django debug mode | `False` |
 | `ALLOWED_HOSTS` | Allowed hostnames | `your-app.onrender.com` |
 | `SECRET_KEY` | Django secret key | Generate new one |
@@ -169,7 +169,7 @@ Once deployed, your JalNidhi AI app will be accessible at:
 
 Features available:
 - ✅ Rainwater harvesting calculator
-- ✅ AI-powered chatbot (with Groq API)
+- ✅ AI-powered chatbot (with OpenAI API)
 - ✅ Water savings dashboard
 - ✅ Analytics and reporting
 - ✅ Mobile-responsive design

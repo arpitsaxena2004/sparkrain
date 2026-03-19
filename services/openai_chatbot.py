@@ -1,35 +1,35 @@
 import os
 import json
 from typing import Dict, List, Optional
-from groq import Groq
+from openai import OpenAI
 from django.conf import settings
 from .rainwater_calculator import RAINFALL_MAP, VALID_DISTRICTS
 from .water_savings import BADGE_LEVELS, WATER_COST_PER_LITER_INR
 
 
-class GroqRainwaterChatbot:
+class OpenAIRainwaterChatbot:
     def __init__(self):
-        # Initialize Groq client using hardcoded API key from Django settings
-        self.groq_api_key = getattr(settings, 'GROQ_API_KEY', None)
+        # Initialize OpenAI client using hardcoded API key from Django settings
+        self.openai_api_key = getattr(settings, 'OPENAI_API_KEY', None)
         self.chatbot_config = getattr(settings, 'CHATBOT_CONFIG', {})
         
         # Check if API key is properly configured
-        if not self.groq_api_key or self.groq_api_key == 'your-groq-api-key-here':
-            self.groq_api_key = None
-            print("⚠️  WARNING: Groq API key not configured properly")
-            print("   For local development: Add GROQ_API_KEY to .env file")
-            print("   For production: Set GROQ_API_KEY environment variable")
+        if not self.openai_api_key or self.openai_api_key == 'your-openai-api-key-here':
+            self.openai_api_key = None
+            print("⚠️  WARNING: OpenAI API key not configured properly")
+            print("   For local development: Add OPENAI_API_KEY to .env file")
+            print("   For production: Set OPENAI_API_KEY environment variable")
             print("   Currently using fallback responses instead of AI")
-            print("   Get your API key from: https://console.groq.com/")
+            print("   Get your API key from: https://platform.openai.com/")
             print("   For better responses, add your API key and restart the server")
         
         self.client = None
-        if self.groq_api_key:
+        if self.openai_api_key:
             try:
-                self.client = Groq(api_key=self.groq_api_key)
-                print("✅ Groq client initialized successfully!")
+                self.client = OpenAI(api_key=self.openai_api_key)
+                print("✅ OpenAI client initialized successfully!")
             except Exception as e:
-                print(f"❌ Error initializing Groq client: {e}")
+                print(f"❌ Error initializing OpenAI client: {e}")
                 print("   Please check if your API key is valid")
                 self.client = None
         
@@ -90,8 +90,8 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
         
         return "\n".join(context_info) if context_info else "No user calculation data available."
 
-    def get_groq_response(self, message: str, user_context: Dict = None) -> Optional[str]:
-        """Get response from Groq API"""
+    def get_openai_response(self, message: str, user_context: Dict = None) -> Optional[str]:
+        """Get response from OpenAI API"""
         if not self.client:
             return None
         
@@ -104,23 +104,24 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
                 {"role": "user", "content": message}
             ]
             
+            model = self.chatbot_config.get('OPENAI_MODEL', 'gpt-4o-mini')
             response = self.client.chat.completions.create(
-                model="llama-3.1-70b-versatile",  # Fast and capable model
+                model=model,
                 messages=messages,
-                max_tokens=500,  # Keep responses concise
-                temperature=0.7,  # Balanced creativity and consistency
-                top_p=0.9,
+                max_tokens=self.chatbot_config.get('MAX_TOKENS', 500),
+                temperature=self.chatbot_config.get('TEMPERATURE', 0.7),
+                top_p=self.chatbot_config.get('TOP_P', 0.9),
                 stream=False
             )
             
             return response.choices[0].message.content.strip()
             
         except Exception as e:
-            print(f"Groq API error: {e}")
+            print(f"OpenAI API error: {e}")
             return None
 
     def get_fallback_response(self, message: str) -> str:
-        """Enhanced fallback responses when Groq API is not available"""
+        """Enhanced fallback responses when OpenAI API is not available"""
         message_lower = message.lower()
         
         # Import rainfall data for better responses
@@ -165,19 +166,19 @@ Answer all questions related to rainwater harvesting, water conservation, enviro
             return "Thank you for using JalNidhi AI! Remember, every drop counts in water conservation. Feel free to ask me anything about rainwater harvesting anytime! 💧🌍"
         
         else:
-            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data for 600+ districts\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\n**Note**: For best AI responses, set GROQ_API_KEY environment variable\n\nWhat would you like to know?"
+            return "I'm here to help with rainwater harvesting questions! I can assist with:\n\n• 🧮 Calculator guidance\n• 💰 Cost estimates\n• 🌧️ Rainfall data for 600+ districts\n• 🔧 Technical specifications\n• 🌍 Environmental benefits\n• 📊 System comparisons\n\n**Note**: For best AI responses, set OPENAI_API_KEY environment variable\n\nWhat would you like to know?"
 
     def get_response(self, message: str, user_context: Dict = None) -> str:
         """Main method to get chatbot response"""
-        # Try Groq API first
-        groq_response = self.get_groq_response(message, user_context)
+        # Try OpenAI API first
+        openai_response = self.get_openai_response(message, user_context)
         
-        if groq_response:
-            return groq_response
+        if openai_response:
+            return openai_response
         
         # Fallback to rule-based responses
         return self.get_fallback_response(message)
 
 
 # Global chatbot instance
-groq_chatbot = GroqRainwaterChatbot()
+chatbot = OpenAIRainwaterChatbot()
