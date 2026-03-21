@@ -25,3 +25,16 @@ class UserWaterSavings(models.Model):
     badge = models.CharField(max_length=64)
 
     calculation_date = models.DateTimeField(auto_now_add=True)
+
+class Vendor(models.Model):
+    name = models.CharField(max_length=255)
+    contact_email = models.EmailField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    services_offered = models.TextField(help_text="Services this vendor provides.")
+    description = models.TextField(blank=True, null=True)
+    added_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

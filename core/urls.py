@@ -10,5 +10,6 @@ urlpatterns = [
     path('api/savings/latest/', views.savings_latest_api, name='savings_latest_api'),
     path('api/chatbot/', views.chatbot_api, name='chatbot_api'),
     path('about/', views.about, name='about'),
+    path('vendors/', views.vendor_list, name='vendors'),
     path('calculate/', views.calculate, name='calculate'),
 ]

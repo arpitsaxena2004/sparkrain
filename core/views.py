@@ -6,7 +6,7 @@ import math
 import json
 from datetime import datetime, timezone
 from .utils import predict_suitability, predict_cost
-from .models import UserWaterSavings
+from .models import UserWaterSavings, Vendor
 from services.rainwater_calculator import (
     calculate_water,
     get_district_rainfall,
@@ -33,6 +33,11 @@ def home(request):
 
 def about(request):
     return render(request, "about.html")
+
+
+def vendor_list(request):
+    vendors = Vendor.objects.all().order_by('-added_date')
+    return render(request, "vendors.html", {"vendors": vendors})
 
 
 def analytics(request):
