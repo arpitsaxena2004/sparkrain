@@ -448,6 +448,11 @@ def water_guard_mvp(request):
     })
 
 
+def rainwater_animation(request):
+    """Interactive animated rainwater harvesting system visualization"""
+    return render(request, 'rainwater_animation.html')
+
+
 @csrf_exempt
 def flood_prediction_api(request):
     """API endpoint for AI flood prediction"""

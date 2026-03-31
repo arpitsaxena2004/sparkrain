@@ -16,6 +16,7 @@ urlpatterns = [
     # Flood prediction & water management
     path('flood/', views.flood_dashboard, name='flood_dashboard'),
     path('mvp/', views.water_guard_mvp, name='water_guard_mvp'),
+    path('animation/', views.rainwater_animation, name='rainwater_animation'),
     path('api/flood/predict/', views.flood_prediction_api, name='flood_prediction_api'),
     path('api/tank/update/', views.update_tank_level, name='update_tank_level'),
     path('flood/history/', views.prediction_history, name='prediction_history'),

@@ -1,0 +1,742 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Live System Demo - JalNidhi{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        overflow-x: hidden;
+        background: #f8fafc;
+    }
+    
+    .demo-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header-section {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 30px 20px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 16px;
+        color: white;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .header-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .header-section p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    .canvas-wrapper {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    #rainwaterCanvas {
+        width: 100%;
+        height: 600px;
+        border-radius: 12px;
+        background: linear-gradient(to bottom, #dbeafe 0%, #eff6ff 100%);
+        cursor: pointer;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .controls-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .controls-panel h2 {
+        color: #1e293b;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .control-group {
+        margin-bottom: 20px;
+    }
+    
+    .control-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+    
+    .btn-control {
+        padding: 12px 24px;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin: 5px;
+        background: white;
+        color: #3b82f6;
+        font-size: 0.95rem;
+    }
+    
+    .btn-control:hover {
+        background: #3b82f6;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-control.active {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .slider {
+        width: 100%;
+        height: 8px;
+        border-radius: 5px;
+        background: #e2e8f0;
+        outline: none;
+        -webkit-appearance: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    }
+    
+    .slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    }
+    
+    .data-display {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    
+    .data-card {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        transition: transform 0.3s;
+    }
+    
+    .data-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    .data-value {
+        font-size: 36px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .data-label {
+        font-size: 14px;
+        opacity: 0.95;
+        font-weight: 500;
+    }
+    
+    .legend {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .legend-item {
+        display: inline-block;
+        margin: 8px 16px 8px 0;
+        font-size: 14px;
+        color: #475569;
+    }
+    
+    .legend-color {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .info-section {
+        background: #f8fafc;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .info-section ol {
+        line-height: 2;
+        color: #475569;
+        padding-left: 20px;
+    }
+    
+    .info-section strong {
+        color: #1e293b;
+    }
+    
+    @media (max-width: 768px) {
+        #rainwaterCanvas {
+            height: 400px;
+        }
+        
+        .data-display {
+            grid-template-columns: 1fr;
+        }
+        
+        .header-section h1 {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+
+<div class="demo-container">
+    <div class="header-section">
+        <h1>🌊 Live Rainwater Harvesting Demo</h1>
+        <p>Watch how rainwater flows from roof to storage in real-time</p>
+    </div>
+    
+    <div class="canvas-wrapper">
+        <canvas id="rainwaterCanvas"></canvas>
+    </div>
+    
+    <div class="controls-panel">
+        <h2>🎮 Simulation Controls</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <div class="control-group">
+                <label>Playback Control</label>
+                <button class="btn-control active" onclick="animation.togglePlay()" id="playBtn">
+                    ▶️ Play
+                </button>
+                <button class="btn-control" onclick="animation.reset()">
+                    🔄 Reset
+                </button>
+            </div>
+            
+            <div class="control-group">
+                <label>Animation Speed: <span id="speedValue" style="color: #3b82f6;">1.0x</span></label>
+                <input type="range" min="0.5" max="3" step="0.5" value="1" class="slider" 
+                       oninput="animation.setSpeed(this.value)" id="speedSlider">
+            </div>
+            
+            <div class="control-group">
+                <label>Rainfall Intensity: <span id="rainfallValue" style="color: #3b82f6;">50</span> mm/hr</label>
+                <input type="range" min="0" max="100" value="50" class="slider" 
+                       oninput="animation.setRainfall(this.value)" id="rainfallSlider">
+            </div>
+        </div>
+        
+        <div class="control-group" style="margin-top: 20px;">
+            <label>Quick Scenarios</label>
+            <button class="btn-control" onclick="animation.setScenario('heavy')">
+                🌧️ Heavy Monsoon (80mm/hr)
+            </button>
+            <button class="btn-control" onclick="animation.setScenario('normal')">
+                ☀️ Normal Day (20mm/hr)
+            </button>
+            <button class="btn-control" onclick="animation.setScenario('drought')">
+                🏜️ Drought (0mm/hr)
+            </button>
+        </div>
+        
+        <div class="legend">
+            <strong style="color: #1e293b;">System Components:</strong>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #3b82f6;"></span>
+                Water Flow
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #8b4513;"></span>
+                Roof
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #64748b;"></span>
+                Pipes
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #0ea5e9;"></span>
+                Filter
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #60a5fa;"></span>
+                Storage Tank
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ef4444;"></span>
+                Overflow
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls-panel">
+        <h2>📊 Real-Time Metrics</h2>
+        <div class="data-display">
+            <div class="data-card">
+                <div class="data-label">Current Rainfall</div>
+                <div class="data-value" id="displayRainfall">50</div>
+                <div class="data-label">mm/hr</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-label">Tank Level</div>
+                <div class="data-value" id="displayTankLevel">0</div>
+                <div class="data-label">%</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-label">Water Collected</div>
+                <div class="data-value" id="displayCollected">0</div>
+                <div class="data-label">Liters</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-label">Collection Rate</div>
+                <div class="data-value" id="displayRate">0</div>
+                <div class="data-label">L/min</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-label">Overflow</div>
+                <div class="data-value" id="displayOverflow">0</div>
+                <div class="data-label">Liters</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-label">Efficiency</div>
+                <div class="data-value" id="displayEfficiency">95</div>
+                <div class="data-label">%</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls-panel info-section">
+        <h2 style="color: #1e293b; margin-bottom: 16px;">ℹ️ How It Works</h2>
+        <ol>
+            <li><strong>Rainfall:</strong> Rain falls on the rooftop catchment area</li>
+            <li><strong>Collection:</strong> Water flows through gutters to downpipes</li>
+            <li><strong>Filtration:</strong> First flush and filter remove debris and contaminants</li>
+            <li><strong>Storage:</strong> Clean water is stored in the main tank</li>
+            <li><strong>Distribution:</strong> Water is used for household needs or irrigation</li>
+            <li><strong>Overflow:</strong> Excess water is safely diverted when tank is full</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+class RainwaterAnimation {
+    constructor() {
+        this.canvas = document.getElementById('rainwaterCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.isPlaying = false;
+        this.animationSpeed = 1.0;
+        this.rainfallIntensity = 50;
+        
+        // Animation data
+        this.raindrops = [];
+        this.waterParticles = [];
+        this.tankLevel = 0;
+        this.tankCapacity = 5000;
+        this.waterCollected = 0;
+        this.overflow = 0;
+        this.collectionRate = 0;
+        
+        this.setupCanvas();
+        this.animate();
+    }
+    
+    setupCanvas() {
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width * window.devicePixelRatio;
+        this.canvas.height = rect.height * window.devicePixelRatio;
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        this.width = rect.width;
+        this.height = rect.height;
+    }
+    
+    togglePlay() {
+        this.isPlaying = !this.isPlaying;
+        const btn = document.getElementById('playBtn');
+        btn.textContent = this.isPlaying ? '⏸️ Pause' : '▶️ Play';
+        btn.className = this.isPlaying ? 'btn-control active' : 'btn-control active';
+    }
+    
+    reset() {
+        this.raindrops = [];
+        this.waterParticles = [];
+        this.tankLevel = 0;
+        this.waterCollected = 0;
+        this.overflow = 0;
+        this.updateDisplay();
+    }
+    
+    setSpeed(speed) {
+        this.animationSpeed = parseFloat(speed);
+        document.getElementById('speedValue').textContent = speed + 'x';
+    }
+    
+    setRainfall(intensity) {
+        this.rainfallIntensity = parseInt(intensity);
+        document.getElementById('rainfallValue').textContent = intensity;
+        document.getElementById('displayRainfall').textContent = intensity;
+    }
+    
+    setScenario(type) {
+        const scenarios = {
+            'heavy': 80,
+            'normal': 20,
+            'drought': 0
+        };
+        const intensity = scenarios[type];
+        this.setRainfall(intensity);
+        document.getElementById('rainfallSlider').value = intensity;
+        if (!this.isPlaying) this.togglePlay();
+    }
+    
+    createRaindrop() {
+        if (this.rainfallIntensity > 0 && Math.random() < this.rainfallIntensity / 100) {
+            this.raindrops.push({
+                x: Math.random() * this.width,
+                y: -10,
+                speed: 5 + Math.random() * 3,
+                length: 10 + Math.random() * 10
+            });
+        }
+    }
+    
+    createWaterParticle(x, y, targetX, targetY, stage) {
+        this.waterParticles.push({
+            x, y, targetX, targetY, stage,
+            progress: 0,
+            speed: 0.02 + Math.random() * 0.02
+        });
+    }
+    
+    drawRoof() {
+        const ctx = this.ctx;
+        const roofY = this.height * 0.15;
+        const roofHeight = 60;
+        
+        // Roof
+        ctx.fillStyle = '#8b4513';
+        ctx.fillRect(this.width * 0.2, roofY, this.width * 0.6, roofHeight);
+        
+        // Roof edge
+        ctx.fillStyle = '#a0522d';
+        ctx.fillRect(this.width * 0.2, roofY, this.width * 0.6, 10);
+        
+        // Gutters
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(this.width * 0.18, roofY + roofHeight, 30, 10);
+        ctx.fillRect(this.width * 0.82 - 30, roofY + roofHeight, 30, 10);
+    }
+    
+    drawPipes() {
+        const ctx = this.ctx;
+        const pipeX1 = this.width * 0.2;
+        const pipeX2 = this.width * 0.8;
+        const pipeTop = this.height * 0.15 + 70;
+        const pipeBottom = this.height * 0.5;
+        
+        // Downpipes
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(pipeX1, pipeTop, 15, pipeBottom - pipeTop);
+        ctx.fillRect(pipeX2 - 15, pipeTop, 15, pipeBottom - pipeTop);
+        
+        // Pipe highlights
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(pipeX1, pipeTop, 5, pipeBottom - pipeTop);
+        ctx.fillRect(pipeX2 - 15, pipeTop, 5, pipeBottom - pipeTop);
+    }
+    
+    drawFilter() {
+        const ctx = this.ctx;
+        const filterX = this.width * 0.5 - 40;
+        const filterY = this.height * 0.5;
+        
+        // Filter box
+        ctx.fillStyle = '#0ea5e9';
+        ctx.fillRect(filterX, filterY, 80, 60);
+        
+        // Filter details
+        ctx.fillStyle = '#0284c7';
+        for (let i = 0; i < 3; i++) {
+            ctx.fillRect(filterX + 10, filterY + 10 + i * 15, 60, 10);
+        }
+        
+        // Label
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('FILTER', filterX + 40, filterY + 40);
+    }
+    
+    drawTank() {
+        const ctx = this.ctx;
+        const tankX = this.width * 0.5 - 80;
+        const tankY = this.height * 0.65;
+        const tankWidth = 160;
+        const tankHeight = 200;
+        
+        // Tank outline
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(tankX, tankY, tankWidth, tankHeight);
+        
+        // Water level
+        const waterHeight = (this.tankLevel / 100) * tankHeight;
+        const gradient = ctx.createLinearGradient(0, tankY + tankHeight - waterHeight, 0, tankY + tankHeight);
+        gradient.addColorStop(0, '#3b82f6');
+        gradient.addColorStop(1, '#60a5fa');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(tankX + 3, tankY + tankHeight - waterHeight, tankWidth - 6, waterHeight);
+        
+        // Water wave
+        if (this.tankLevel > 0) {
+            ctx.strokeStyle = '#93c5fd';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const waveY = tankY + tankHeight - waterHeight;
+            for (let x = 0; x < tankWidth; x += 5) {
+                const y = waveY + Math.sin((x + Date.now() / 200) * 0.1) * 3;
+                if (x === 0) ctx.moveTo(tankX + x, y);
+                else ctx.lineTo(tankX + x, y);
+            }
+            ctx.stroke();
+        }
+        
+        // Tank label
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 18px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${this.tankLevel.toFixed(0)}%`, tankX + tankWidth / 2, tankY + tankHeight / 2);
+        
+        // Capacity
+        ctx.font = '13px Inter';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(`${(this.tankLevel * this.tankCapacity / 100).toFixed(0)}L / ${this.tankCapacity}L`, 
+                     tankX + tankWidth / 2, tankY + tankHeight / 2 + 22);
+    }
+    
+    drawUsage() {
+        const ctx = this.ctx;
+        const tankX = this.width * 0.5 - 80;
+        const tankY = this.height * 0.65;
+        const tankHeight = 200;
+        
+        // Usage pipe
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(tankX + 160, tankY + tankHeight - 30, 60, 10);
+        
+        // Tap
+        ctx.fillStyle = '#3b82f6';
+        ctx.beginPath();
+        ctx.arc(tankX + 230, tankY + tankHeight - 25, 15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Label
+        ctx.fillStyle = '#475569';
+        ctx.font = '12px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('Usage', tankX + 250, tankY + tankHeight - 20);
+    }
+    
+    drawOverflow() {
+        const ctx = this.ctx;
+        const tankX = this.width * 0.5 - 80;
+        const tankY = this.height * 0.65;
+        
+        if (this.tankLevel >= 100) {
+            // Overflow pipe
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(tankX - 60, tankY + 20, 50, 10);
+            
+            // Overflow particles
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.arc(tankX - 70 + Math.random() * 20, 
+                       tankY + 30 + i * 15 + Math.random() * 10, 
+                       3, 0, Math.PI * 2);
+                ctx.fillStyle = '#ef4444';
+                ctx.fill();
+            }
+            
+            // Label
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 12px Inter';
+            ctx.textAlign = 'right';
+            ctx.fillText('OVERFLOW', tankX - 70, tankY + 15);
+        }
+    }
+    
+    updateRaindrops() {
+        const roofY = this.height * 0.15;
+        const roofLeft = this.width * 0.2;
+        const roofRight = this.width * 0.8;
+        
+        for (let i = this.raindrops.length - 1; i >= 0; i--) {
+            const drop = this.raindrops[i];
+            drop.y += drop.speed * this.animationSpeed;
+            
+            if (drop.y >= roofY && drop.x >= roofLeft && drop.x <= roofRight) {
+                const gutterX = drop.x < this.width * 0.5 ? this.width * 0.2 : this.width * 0.8;
+                this.createWaterParticle(drop.x, roofY + 60, gutterX, this.height * 0.15 + 70, 'gutter');
+                this.raindrops.splice(i, 1);
+            } else if (drop.y > this.height) {
+                this.raindrops.splice(i, 1);
+            }
+        }
+    }
+    
+    updateWaterParticles() {
+        for (let i = this.waterParticles.length - 1; i >= 0; i--) {
+            const particle = this.waterParticles[i];
+            particle.progress += particle.speed * this.animationSpeed;
+            
+            if (particle.progress >= 1) {
+                if (particle.stage === 'gutter') {
+                    this.createWaterParticle(particle.targetX, particle.targetY, 
+                                           this.width * 0.5, this.height * 0.5, 'filter');
+                } else if (particle.stage === 'filter') {
+                    this.createWaterParticle(particle.targetX, particle.targetY, 
+                                           this.width * 0.5, this.height * 0.65 + 150, 'tank');
+                } else if (particle.stage === 'tank') {
+                    if (this.tankLevel < 100) {
+                        this.tankLevel += 0.1;
+                        this.waterCollected += 0.5;
+                        this.collectionRate = this.rainfallIntensity * 0.8;
+                    } else {
+                        this.overflow += 0.5;
+                    }
+                }
+                this.waterParticles.splice(i, 1);
+            }
+        }
+    }
+    
+    drawRaindrops() {
+        const ctx = this.ctx;
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        
+        this.raindrops.forEach(drop => {
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x, drop.y + drop.length);
+            ctx.stroke();
+        });
+    }
+    
+    drawWaterParticles() {
+        const ctx = this.ctx;
+        
+        this.waterParticles.forEach(particle => {
+            const x = particle.x + (particle.targetX - particle.x) * particle.progress;
+            const y = particle.y + (particle.targetY - particle.y) * particle.progress;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = particle.stage === 'filter' ? '#0ea5e9' : '#3b82f6';
+            ctx.fill();
+        });
+    }
+    
+    updateDisplay() {
+        document.getElementById('displayTankLevel').textContent = this.tankLevel.toFixed(0);
+        document.getElementById('displayCollected').textContent = this.waterCollected.toFixed(0);
+        document.getElementById('displayRate').textContent = this.collectionRate.toFixed(1);
+        document.getElementById('displayOverflow').textContent = this.overflow.toFixed(0);
+        
+        const efficiency = this.tankLevel < 100 ? 95 : Math.max(50, 95 - (this.overflow / this.waterCollected * 100));
+        document.getElementById('displayEfficiency').textContent = efficiency.toFixed(0);
+    }
+    
+    animate() {
+        const ctx = this.ctx;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, this.width, this.height);
+        
+        // Sky gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+        gradient.addColorStop(0, '#dbeafe');
+        gradient.addColorStop(1, '#eff6ff');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.width, this.height);
+        
+        if (this.isPlaying) {
+            this.createRaindrop();
+            this.updateRaindrops();
+            this.updateWaterParticles();
+            this.updateDisplay();
+        }
+        
+        // Draw components
+        this.drawRoof();
+        this.drawPipes();
+        this.drawFilter();
+        this.drawTank();
+        this.drawUsage();
+        this.drawOverflow();
+        
+        // Draw particles
+        this.drawRaindrops();
+        this.drawWaterParticles();
+        
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Initialize
+let animation;
+window.addEventListener('load', () => {
+    animation = new RainwaterAnimation();
+});
+
+window.addEventListener('resize', () => {
+    if (animation) {
+        animation.setupCanvas();
+    }
+});
+</script>
+{% endblock %}
