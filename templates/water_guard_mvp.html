@@ -5,30 +5,60 @@
 
 {% block content %}
 <style>
+    /* Clean Minimal Design System - Water Theme */
+    :root {
+        --primary-blue: #1e40af;
+        --light-blue: #dbeafe;
+        --soft-blue: #93c5fd;
+        --text-dark: #1e293b;
+        --text-gray: #64748b;
+        --bg-white: #ffffff;
+        --bg-light: #f8fafc;
+        --border-light: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+        --red-alert: #dc2626;
+        --orange-warning: #f59e0b;
+    }
+    
     .mvp-container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 32px 20px;
+        background: var(--bg-light);
     }
     
     .card {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
+        background: var(--bg-white);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    
+    .card h2 {
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        font-weight: 600;
         margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .grid-3 {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
     
     .grid-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        gap: 24px;
     }
     
     @media (max-width: 1024px) {
@@ -38,35 +68,35 @@
     
     .status-indicator {
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        margin-right: 8px;
-        animation: pulse 2s infinite;
+        margin-right: 10px;
+        animation: pulse 2s ease-in-out infinite;
     }
     
     @keyframes pulse {
         0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+        50% { opacity: 0.6; }
     }
     
     .tank-visual {
         position: relative;
         width: 200px;
         height: 300px;
-        border: 3px solid #333;
-        border-radius: 8px;
-        margin: 20px auto;
+        border: 2px solid var(--border-light);
+        border-radius: 12px;
+        margin: 24px auto;
         overflow: hidden;
-        background: #f0f0f0;
+        background: var(--bg-light);
     }
     
     .tank-water {
         position: absolute;
         bottom: 0;
         width: 100%;
-        background: linear-gradient(to top, #3b82f6, #60a5fa);
-        transition: height 0.5s ease;
+        background: linear-gradient(to top, var(--primary-blue), var(--soft-blue));
+        transition: height 0.6s ease;
     }
     
     .tank-label {
@@ -74,135 +104,152 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 24px;
-        font-weight: bold;
-        color: #333;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
         z-index: 10;
     }
     
     .scenario-btn {
-        padding: 12px 20px;
-        border: 2px solid #3b82f6;
-        border-radius: 8px;
-        background: white;
-        color: #3b82f6;
+        padding: 12px 24px;
+        border: 2px solid var(--primary-blue);
+        border-radius: 10px;
+        background: var(--bg-white);
+        color: var(--primary-blue);
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s;
-        margin: 5px;
+        transition: all 0.2s ease;
+        margin: 6px;
+        font-size: 0.95rem;
     }
     
     .scenario-btn:hover {
-        background: #3b82f6;
+        background: var(--primary-blue);
         color: white;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
     }
     
     .scenario-btn.active {
-        background: #3b82f6;
+        background: var(--primary-blue);
         color: white;
     }
     
     .alert-box {
-        padding: 16px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
         font-weight: 500;
+        border-left: 4px solid;
     }
     
     .alert-normal {
-        background: #d1fae5;
-        color: #065f46;
-        border-left: 4px solid #22c55e;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-left-color: var(--primary-blue);
     }
     
     .alert-flood {
         background: #fee2e2;
-        color: #991b1b;
-        border-left: 4px solid #ef4444;
+        color: var(--red-alert);
+        border-left-color: var(--red-alert);
     }
     
     .alert-scarcity {
         background: #fef3c7;
-        color: #92400e;
-        border-left: 4px solid #eab308;
+        color: #b45309;
+        border-left-color: var(--orange-warning);
     }
     
     .forecast-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 12px;
-        margin-top: 20px;
+        gap: 16px;
+        margin-top: 24px;
     }
     
     .forecast-day {
-        background: #f8fafc;
-        padding: 12px;
-        border-radius: 8px;
+        background: var(--bg-white);
+        padding: 16px;
+        border-radius: 12px;
         text-align: center;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border-light);
+        transition: all 0.2s ease;
+    }
+    
+    .forecast-day:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
     }
     
     .forecast-day.rain {
-        background: #dbeafe;
-        border-color: #3b82f6;
+        background: var(--light-blue);
+        border-color: var(--soft-blue);
     }
     
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 100%);
         color: white;
-        padding: 20px;
-        border-radius: 12px;
+        padding: 28px;
+        border-radius: 16px;
         text-align: center;
+        transition: transform 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(30, 64, 175, 0.2);
     }
     
     .metric-value {
-        font-size: 36px;
-        font-weight: bold;
-        margin: 10px 0;
+        font-size: 42px;
+        font-weight: 700;
+        margin: 12px 0;
     }
     
     .metric-label {
         font-size: 14px;
-        opacity: 0.9;
+        opacity: 0.95;
+        font-weight: 500;
     }
     
     .voice-btn {
-        width: 60px;
-        height: 60px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
-        background: #ef4444;
+        background: var(--primary-blue);
         color: white;
         border: none;
         cursor: pointer;
         font-size: 24px;
-        transition: all 0.3s;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
     }
     
     .voice-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.6);
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
     }
     
     .voice-btn.listening {
-        animation: voicePulse 1s infinite;
-        background: #22c55e;
+        animation: voicePulse 1.5s ease-in-out infinite;
+        background: var(--primary-blue);
     }
     
     @keyframes voicePulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.15); }
+        0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3); }
+        50% { transform: scale(1.08); box-shadow: 0 8px 20px rgba(30, 64, 175, 0.5); }
     }
     
     .flow-diagram {
         display: flex;
         align-items: center;
         justify-content: space-around;
-        padding: 20px;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin: 20px 0;
+        padding: 28px;
+        background: var(--bg-white);
+        border-radius: 16px;
+        margin: 24px 0;
+        border: 1px solid var(--border-light);
     }
     
     .flow-step {
@@ -212,103 +259,137 @@
     
     .flow-arrow {
         font-size: 24px;
-        color: #3b82f6;
-        margin: 0 10px;
+        color: var(--soft-blue);
+        margin: 0 12px;
     }
     
     .input-group {
-        margin-bottom: 16px;
+        margin-bottom: 20px;
     }
     
     .input-group label {
         display: block;
-        margin-bottom: 6px;
-        font-weight: 500;
-        color: #374151;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
     }
     
-    .input-group input {
+    .input-group input, .input-group select {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 16px;
+        padding: 12px 16px;
+        border: 1px solid var(--border-light);
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        background: var(--bg-white);
+        color: var(--text-dark);
+    }
+    
+    .input-group input:focus, .input-group select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
     }
     
     .btn-primary {
-        background: #3b82f6;
+        background: var(--primary-blue);
         color: white;
-        padding: 12px 24px;
+        padding: 14px 28px;
         border: none;
-        border-radius: 6px;
+        border-radius: 10px;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
         width: 100%;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
     }
     
     .btn-primary:hover {
-        background: #2563eb;
+        background: #1e3a8a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
     }
     
     .btn-primary:disabled {
-        background: #9ca3af;
+        background: var(--text-gray);
         cursor: not-allowed;
+        transform: none;
     }
     
     .action-card {
-        background: #f8fafc;
-        border-left: 4px solid #3b82f6;
-        padding: 16px;
-        border-radius: 6px;
-        margin-top: 12px;
+        background: var(--light-blue);
+        border-left: 4px solid var(--primary-blue);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 16px;
     }
     
     .demo-badge {
         display: inline-block;
-        background: #fbbf24;
-        color: #78350f;
-        padding: 4px 12px;
-        border-radius: 12px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        padding: 6px 14px;
+        border-radius: 20px;
         font-size: 12px;
-        font-weight: 600;
-        margin-left: 10px;
+        font-weight: 700;
+        margin-left: 12px;
+        letter-spacing: 0.5px;
+    }
+    
+    #chatMicBtn:hover {
+        background: var(--primary-blue) !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    #chatMicBtn.listening {
+        background: var(--primary-blue) !important;
+        color: white !important;
+        animation: micPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes micPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
     }
 </style>
 
 <div class="mvp-container">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1>💧 Water Guard - Smart Rainwater Harvesting MVP <span class="demo-badge">DEMO MODE</span></h1>
-        <p style="color: #6b7280; margin-top: 10px;">Complete AI-powered water management simulation</p>
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="color: var(--text-dark); font-size: 2.5rem; font-weight: 700; margin-bottom: 12px;">
+            💧 Water Guard <span class="demo-badge">LIVE DEMO</span>
+        </h1>
+        <p style="color: var(--text-gray); font-size: 1.1rem; font-weight: 400;">Smart AI-powered water management system</p>
     </div>
     
     <!-- System Flow Diagram -->
     <div class="card">
-        <h2 style="text-align: center; margin-bottom: 20px;">🔄 System Flow</h2>
+        <h2 style="text-align: center;">🔄 System Flow</h2>
         <div class="flow-diagram">
             <div class="flow-step">
-                <div style="font-size: 36px;">📊</div>
-                <div style="font-weight: 600; margin-top: 8px;">Input Data</div>
-                <div style="font-size: 12px; color: #6b7280;">Rainfall, Tank Level</div>
+                <div style="font-size: 40px; margin-bottom: 12px;">📊</div>
+                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">Input Data</div>
+                <div style="font-size: 13px; color: var(--text-gray);">Rainfall & Tank Level</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-step">
-                <div style="font-size: 36px;">🤖</div>
-                <div style="font-weight: 600; margin-top: 8px;">AI Analysis</div>
-                <div style="font-size: 12px; color: #6b7280;">Risk Classification</div>
+                <div style="font-size: 40px; margin-bottom: 12px;">🤖</div>
+                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">AI Analysis</div>
+                <div style="font-size: 13px; color: var(--text-gray);">Risk Classification</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-step">
-                <div style="font-size: 36px;">⚙️</div>
-                <div style="font-weight: 600; margin-top: 8px;">Decision Engine</div>
-                <div style="font-size: 12px; color: #6b7280;">Smart Actions</div>
+                <div style="font-size: 40px; margin-bottom: 12px;">⚙️</div>
+                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">Decision Engine</div>
+                <div style="font-size: 13px; color: var(--text-gray);">Smart Actions</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-step">
-                <div style="font-size: 36px;">📱</div>
-                <div style="font-weight: 600; margin-top: 8px;">Output</div>
-                <div style="font-size: 12px; color: #6b7280;">Alerts & Control</div>
+                <div style="font-size: 40px; margin-bottom: 12px;">📱</div>
+                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">Output</div>
+                <div style="font-size: 13px; color: var(--text-gray);">Alerts & Control</div>
             </div>
         </div>
     </div>
@@ -320,17 +401,17 @@
     
     <!-- Demo Scenario Controls -->
     <div class="card">
-        <h2>🎮 Demo Simulation Controls</h2>
-        <p style="color: #6b7280; margin-bottom: 16px;">Click a scenario to simulate different weather conditions</p>
+        <h2>🎮 Simulation Controls</h2>
+        <p style="color: var(--text-gray); margin-bottom: 20px; font-size: 0.95rem;">Select a scenario to simulate different weather conditions</p>
         <div style="text-align: center;">
             <button class="scenario-btn" onclick="runScenario('heavy_rain')">
-                🌧️ Heavy Rain (Flood Risk)
+                🌧️ Heavy Rain
             </button>
             <button class="scenario-btn active" onclick="runScenario('normal')">
                 ☀️ Normal Day
             </button>
             <button class="scenario-btn" onclick="runScenario('drought')">
-                🏜️ Drought Mode (Scarcity)
+                🏜️ Drought Mode
             </button>
         </div>
     </div>
@@ -342,7 +423,7 @@
             
             <div class="input-group">
                 <label for="city">Location</label>
-                <input type="text" id="city" placeholder="e.g., Mumbai" value="Mumbai">
+                <input type="text" id="city" placeholder="Enter city name" value="Mumbai">
             </div>
             
             <div class="input-group">
@@ -356,14 +437,14 @@
             </div>
             
             <button class="btn-primary" onclick="runPrediction()">
-                🤖 Run AI Prediction
+                Run AI Prediction
             </button>
             
-            <div style="margin-top: 20px; text-align: center;">
+            <div style="margin-top: 32px; text-align: center;">
                 <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice Assistant">
                     🎤
                 </button>
-                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;" id="voiceStatus">Click to activate voice assistant</p>
+                <p style="font-size: 13px; color: var(--text-gray); margin-top: 12px;" id="voiceStatus">Click to activate voice assistant</p>
             </div>
         </div>
         
@@ -374,25 +455,28 @@
                 <div class="tank-water" id="tankWater" style="height: 50%;"></div>
                 <div class="tank-label" id="tankLabel">50%</div>
             </div>
-            <div style="text-align: center; color: #6b7280;">
+            <div style="text-align: center; color: var(--text-gray); font-size: 0.95rem;">
                 <p id="tankInfo">Capacity: 5000L | Current: 2500L</p>
             </div>
         </div>
     </div>
     
     <!-- Real-time Metrics -->
-    <div class="grid-3" id="metricsSection" style="display: none;">
-        <div class="metric-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <div class="metric-label">7-Day Rainfall</div>
-            <div class="metric-value" id="metricRainfall">0 mm</div>
-        </div>
-        <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            <div class="metric-label">Risk Level</div>
-            <div class="metric-value" id="metricRisk">NORMAL</div>
-        </div>
-        <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-            <div class="metric-label">AI Confidence</div>
-            <div class="metric-value" id="metricConfidence">0%</div>
+    <div class="card" id="metricsSection" style="display: none;">
+        <h2>📊 Real-Time Metrics</h2>
+        <div class="grid-3">
+            <div class="metric-card">
+                <div class="metric-label">7-Day Rainfall</div>
+                <div class="metric-value" id="metricRainfall">0 mm</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Risk Level</div>
+                <div class="metric-value" id="metricRisk">NORMAL</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">AI Confidence</div>
+                <div class="metric-value" id="metricConfidence">0%</div>
+            </div>
         </div>
     </div>
     
@@ -400,23 +484,23 @@
     <div class="card" id="predictionResults" style="display: none;">
         <h2>
             <span class="status-indicator" id="statusIndicator"></span>
-            AI Prediction Results
+            🤖 AI Prediction Results
         </h2>
         
-        <div style="margin-top: 20px;">
-            <h3>Status: <span id="riskLevel"></span></h3>
-            <p><strong>Confidence:</strong> <span id="confidence"></span>%</p>
-            <p><strong>7-Day Rainfall Forecast:</strong> <span id="rainfall7day"></span> mm</p>
+        <div style="margin-top: 24px;">
+            <h3 style="color: var(--text-dark); font-weight: 600; margin-bottom: 16px;">Status: <span id="riskLevel"></span></h3>
+            <p style="color: var(--text-gray); margin-bottom: 8px;"><strong style="color: var(--text-dark);">Confidence:</strong> <span id="confidence"></span>%</p>
+            <p style="color: var(--text-gray);"><strong style="color: var(--text-dark);">7-Day Rainfall Forecast:</strong> <span id="rainfall7day"></span> mm</p>
         </div>
         
         <div class="action-card">
-            <h4>💡 Recommended Action</h4>
-            <p id="recommendedAction"></p>
+            <h4 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 600;">💡 Recommended Action</h4>
+            <p id="recommendedAction" style="color: var(--text-dark);"></p>
         </div>
         
         <div class="action-card">
-            <h4>⚙️ System Action (Automated)</h4>
-            <p id="systemAction"></p>
+            <h4 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 600;">⚙️ System Action</h4>
+            <p id="systemAction" style="color: var(--text-dark);"></p>
         </div>
     </div>
     
@@ -429,23 +513,29 @@
     <!-- Chatbot Integration -->
     <div class="card">
         <h2>💬 Ask Water Guard Assistant</h2>
-        <p style="color: #6b7280; margin-bottom: 16px;">Try asking: "What's my current water level?" or "Should I conserve water?"</p>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="chatInput" placeholder="Type your question..." style="flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px;">
-            <button onclick="askChatbot()" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+        <p style="color: var(--text-gray); margin-bottom: 20px; font-size: 0.95rem;">Ask questions about water level, predictions, and system actions</p>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <input type="text" id="chatInput" placeholder="Type or speak your question..." style="flex: 1; padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 10px; font-size: 15px;">
+            <button id="chatMicBtn" onclick="toggleChatVoice()" style="padding: 14px 16px; background: var(--bg-white); color: var(--primary-blue); border: 2px solid var(--primary-blue); border-radius: 10px; cursor: pointer; font-size: 20px; transition: all 0.2s; min-width: 52px;" title="Voice Input">
+                🎤
+            </button>
+            <button onclick="askChatbot()" style="padding: 14px 28px; background: var(--primary-blue); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
                 Send
             </button>
         </div>
-        <div id="chatResponse" style="margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; display: none;">
-            <strong>Assistant:</strong>
-            <p id="chatResponseText" style="margin-top: 8px;"></p>
+        <div id="chatVoiceStatus" style="margin-top: 12px; text-align: center; color: var(--text-gray); font-size: 13px; display: none;">
+            🎤 Listening... Speak now
+        </div>
+        <div id="chatResponse" style="margin-top: 20px; padding: 20px; background: var(--light-blue); border-radius: 10px; display: none; border: 1px solid var(--soft-blue);">
+            <strong style="color: var(--primary-blue);">Assistant:</strong>
+            <p id="chatResponseText" style="margin-top: 12px; color: var(--text-dark); line-height: 1.6;"></p>
         </div>
     </div>
     
     <!-- Borewell Depth Estimation -->
     <div class="card">
         <h2>🕳️ AI Borewell Depth Estimator</h2>
-        <p style="color: #6b7280; margin-bottom: 16px;">Estimate optimal borewell depth using AI - Select district to auto-fill rainfall data</p>
+        <p style="color: var(--text-gray); margin-bottom: 24px; font-size: 0.95rem;">Estimate optimal borewell depth using AI - Select district to auto-fill rainfall data</p>
         
         <div class="grid-2">
             <div>
@@ -456,18 +546,18 @@
                     <datalist id="districtList">
                         <!-- Will be populated by JavaScript -->
                     </datalist>
-                    <small style="color: #6b7280;">Start typing to see suggestions from 600+ districts</small>
+                    <small style="color: var(--text-gray); font-size: 13px;">Start typing to see suggestions from 600+ districts</small>
                 </div>
                 
                 <div class="input-group">
-                    <label for="borewellRainfall">Annual Rainfall (mm) <span style="color: #22c55e;" id="rainfallStatus"></span></label>
-                    <input type="number" id="borewellRainfall" placeholder="Auto-filled from district data" value="" readonly style="background: #f9fafb;">
-                    <small style="color: #6b7280;">Automatically fetched from dataset</small>
+                    <label for="borewellRainfall">Annual Rainfall (mm) <span style="color: var(--primary-blue); font-weight: 600;" id="rainfallStatus"></span></label>
+                    <input type="number" id="borewellRainfall" placeholder="Auto-filled from district data" value="" readonly style="background: var(--bg-light);">
+                    <small style="color: var(--text-gray); font-size: 13px;">Automatically fetched from dataset</small>
                 </div>
                 
                 <div class="input-group">
                     <label for="borewellRegion">Region Type</label>
-                    <select id="borewellRegion" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <select id="borewellRegion">
                         <option value="urban">Urban</option>
                         <option value="semi_urban" selected>Semi-Urban</option>
                         <option value="rural">Rural</option>
@@ -476,7 +566,7 @@
                 
                 <div class="input-group">
                     <label for="borewellSoil">Soil Type</label>
-                    <select id="borewellSoil" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <select id="borewellSoil">
                         <option value="loamy" selected>Loamy (Best)</option>
                         <option value="clay">Clay</option>
                         <option value="sandy">Sandy</option>
@@ -485,54 +575,54 @@
                 </div>
                 
                 <button class="btn-primary" onclick="estimateBorewell()" id="borewellEstimateBtn" disabled>
-                    🔍 Estimate Borewell Depth
+                    Estimate Borewell Depth
                 </button>
-                <small style="color: #6b7280; display: block; margin-top: 8px;">Select a district to enable estimation</small>
+                <small style="color: var(--text-gray); display: block; margin-top: 12px; font-size: 13px;">Select a district to enable estimation</small>
             </div>
             
             <div id="borewellResults" style="display: none;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 16px;">
-                    <div style="font-size: 14px; opacity: 0.9;">Recommended Depth</div>
-                    <div style="font-size: 48px; font-weight: bold; margin: 10px 0;" id="borewellDepth">150 ft</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Range: <span id="borewellRange">100-200 ft</span></div>
+                <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 100%); color: white; padding: 28px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 14px; opacity: 0.95; font-weight: 500;">Recommended Depth</div>
+                    <div style="font-size: 52px; font-weight: 700; margin: 16px 0;" id="borewellDepth">150 ft</div>
+                    <div style="font-size: 14px; opacity: 0.95;">Range: <span id="borewellRange">100-200 ft</span></div>
                 </div>
                 
-                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                    <strong>💧 Water Availability:</strong> <span id="borewellAvailability">Moderate</span>
+                <div style="background: var(--light-blue); padding: 18px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--soft-blue);">
+                    <strong style="color: var(--primary-blue);">💧 Water Availability:</strong> <span id="borewellAvailability" style="color: var(--text-dark);">Moderate</span>
                 </div>
                 
-                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                    <strong>⚡ Estimated Yield:</strong> <span id="borewellYield">500 L/hr</span>
+                <div style="background: var(--light-blue); padding: 18px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--soft-blue);">
+                    <strong style="color: var(--primary-blue);">⚡ Estimated Yield:</strong> <span id="borewellYield" style="color: var(--text-dark);">500 L/hr</span>
                 </div>
                 
-                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                    <strong>🎯 Confidence:</strong> <span id="borewellConfidence">75%</span>
+                <div style="background: var(--light-blue); padding: 18px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--soft-blue);">
+                    <strong style="color: var(--primary-blue);">🎯 Confidence:</strong> <span id="borewellConfidence" style="color: var(--text-dark);">75%</span>
                 </div>
                 
-                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                    <strong>💰 Cost Estimate:</strong> ₹<span id="borewellCostMin">30,000</span> - ₹<span id="borewellCostMax">50,000</span>
+                <div style="background: var(--light-blue); padding: 18px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--soft-blue);">
+                    <strong style="color: var(--primary-blue);">💰 Cost Estimate:</strong> <span style="color: var(--text-dark);">₹<span id="borewellCostMin">30,000</span> - ₹<span id="borewellCostMax">50,000</span></span>
                 </div>
                 
-                <div style="background: #e0f2fe; padding: 16px; border-radius: 8px; border-left: 4px solid #0284c7;">
-                    <strong>📝 Reasoning:</strong>
-                    <p id="borewellReasoning" style="margin-top: 8px; font-size: 14px; line-height: 1.6;"></p>
+                <div style="background: var(--bg-white); padding: 18px; border-radius: 10px; border: 1px solid var(--border-light);">
+                    <strong style="color: var(--text-dark);">📝 Reasoning:</strong>
+                    <p id="borewellReasoning" style="margin-top: 12px; font-size: 14px; line-height: 1.7; color: var(--text-gray);"></p>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- How It Works -->
-    <div class="card">
-        <h2>🧠 How This MVP Works</h2>
-        <ol style="line-height: 1.8;">
-            <li><strong>Simulated Inputs:</strong> System accepts or generates rainfall data, tank levels, and weather forecasts</li>
-            <li><strong>AI Classification:</strong> Simple logic classifies conditions into Flood Risk, Water Scarcity, or Normal</li>
-            <li><strong>Decision Engine:</strong> Automatically suggests actions like storing water, releasing excess, or conservation mode</li>
-            <li><strong>Interactive Dashboard:</strong> Real-time visualization of tank levels, predictions, and alerts</li>
-            <li><strong>NLP Chatbot:</strong> Ask questions about water level, predictions, and system actions</li>
-            <li><strong>Voice Assistant:</strong> Hands-free interaction using speech-to-text and text-to-speech</li>
-            <li><strong>Demo Scenarios:</strong> Buttons to simulate Heavy Rain, Normal Day, and Drought conditions</li>
-            <li><strong>IoT-Ready:</strong> Can be integrated with real sensors (water level, rainfall gauge, flow meters)</li>
+    <div class="card" style="background: var(--bg-white);">
+        <h2>ℹ️ How This System Works</h2>
+        <ol style="line-height: 2; color: var(--text-gray); padding-left: 24px;">
+            <li><strong style="color: var(--text-dark);">Simulated Inputs:</strong> System accepts or generates rainfall data, tank levels, and weather forecasts</li>
+            <li><strong style="color: var(--text-dark);">AI Classification:</strong> Simple logic classifies conditions into Flood Risk, Water Scarcity, or Normal</li>
+            <li><strong style="color: var(--text-dark);">Decision Engine:</strong> Automatically suggests actions like storing water, releasing excess, or conservation mode</li>
+            <li><strong style="color: var(--text-dark);">Interactive Dashboard:</strong> Real-time visualization of tank levels, predictions, and alerts</li>
+            <li><strong style="color: var(--text-dark);">NLP Chatbot:</strong> Ask questions about water level, predictions, and system actions</li>
+            <li><strong style="color: var(--text-dark);">Voice Assistant:</strong> Hands-free interaction using speech-to-text and text-to-speech</li>
+            <li><strong style="color: var(--text-dark);">Demo Scenarios:</strong> Buttons to simulate Heavy Rain, Normal Day, and Drought conditions</li>
+            <li><strong style="color: var(--text-dark);">IoT-Ready:</strong> Can be integrated with real sensors (water level, rainfall gauge, flow meters)</li>
         </ol>
     </div>
 </div>
@@ -541,10 +631,12 @@
 let currentScenario = 'normal';
 let predictionData = null;
 let recognition = null;
+let chatRecognition = null;
 let synthesis = window.speechSynthesis;
 let isListening = false;
+let isChatListening = false;
 
-// Initialize Speech Recognition
+// Initialize Speech Recognition for main voice button
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
@@ -562,6 +654,38 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         isListening = false;
         document.getElementById('voiceBtn').classList.remove('listening');
         document.getElementById('voiceStatus').textContent = 'Click to activate voice assistant';
+    };
+    
+    // Initialize separate Speech Recognition for chatbot
+    chatRecognition = new SpeechRecognition();
+    chatRecognition.continuous = false;
+    chatRecognition.interimResults = false;
+    chatRecognition.lang = 'en-US';
+    
+    chatRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('chatInput').value = transcript;
+        document.getElementById('chatVoiceStatus').style.display = 'none';
+        document.getElementById('chatMicBtn').style.background = 'var(--bg-white)';
+        document.getElementById('chatMicBtn').style.color = 'var(--primary-blue)';
+        askChatbot(true);
+    };
+    
+    chatRecognition.onend = function() {
+        isChatListening = false;
+        document.getElementById('chatVoiceStatus').style.display = 'none';
+        document.getElementById('chatMicBtn').style.background = 'var(--bg-white)';
+        document.getElementById('chatMicBtn').style.color = 'var(--primary-blue)';
+    };
+    
+    chatRecognition.onerror = function(event) {
+        isChatListening = false;
+        document.getElementById('chatVoiceStatus').style.display = 'none';
+        document.getElementById('chatMicBtn').style.background = 'var(--bg-white)';
+        document.getElementById('chatMicBtn').style.color = 'var(--primary-blue)';
+        if (event.error !== 'no-speech') {
+            alert('Voice recognition error: ' + event.error);
+        }
     };
 }
 
@@ -591,6 +715,27 @@ function toggleVoice() {
         isListening = true;
         document.getElementById('voiceBtn').classList.add('listening');
         document.getElementById('voiceStatus').textContent = 'Listening... Speak now';
+    }
+}
+
+function toggleChatVoice() {
+    if (!chatRecognition) {
+        alert('Speech recognition not supported in this browser. Try Chrome or Edge.');
+        return;
+    }
+    
+    if (isChatListening) {
+        chatRecognition.stop();
+        isChatListening = false;
+        document.getElementById('chatVoiceStatus').style.display = 'none';
+        document.getElementById('chatMicBtn').style.background = 'var(--bg-white)';
+        document.getElementById('chatMicBtn').style.color = 'var(--primary-blue)';
+    } else {
+        chatRecognition.start();
+        isChatListening = true;
+        document.getElementById('chatVoiceStatus').style.display = 'block';
+        document.getElementById('chatMicBtn').style.background = 'var(--primary-blue)';
+        document.getElementById('chatMicBtn').style.color = 'white';
     }
 }
 
@@ -682,7 +827,7 @@ function displayPrediction(data) {
     updateTankInfo(data.tank.capacity, data.tank.current_level);
     
     // Show metrics
-    document.getElementById('metricsSection').style.display = 'grid';
+    document.getElementById('metricsSection').style.display = 'block';
     document.getElementById('metricRainfall').textContent = data.prediction.predicted_rainfall_7days.toFixed(1) + ' mm';
     document.getElementById('metricRisk').textContent = data.prediction.risk_level.replace('_', ' ').toUpperCase();
     document.getElementById('metricConfidence').textContent = (data.prediction.confidence * 100).toFixed(0) + '%';
@@ -745,17 +890,17 @@ function displayForecast(forecast) {
         const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
         
         dayCard.innerHTML = `
-            <div style="font-weight: 600; margin-bottom: 8px;">${dayName}</div>
-            <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+            <div style="font-weight: 600; margin-bottom: 10px; color: var(--text-dark);">${dayName}</div>
+            <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 10px;">
                 ${date.getDate()}/${date.getMonth() + 1}
             </div>
-            <div style="font-size: 20px; margin-bottom: 4px;">
+            <div style="font-size: 24px; margin-bottom: 8px;">
                 ${day.rainfall_mm > 0 ? '🌧️' : '☀️'}
             </div>
-            <div style="font-weight: 600; color: #3b82f6;">
+            <div style="font-weight: 600; color: var(--primary-blue); font-size: 16px;">
                 ${day.rainfall_mm.toFixed(1)}mm
             </div>
-            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+            <div style="font-size: 13px; color: var(--text-gray); margin-top: 6px;">
                 ${day.temperature}°C
             </div>
         `;
