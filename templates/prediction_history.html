@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History - JalNidhi{% endblock %}
+
+{% block content %}
+<style>
+    .history-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .history-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .history-card.flood {
+        border-left-color: #ef4444;
+    }
+    
+    .history-card.scarcity {
+        border-left-color: #eab308;
+    }
+    
+    .history-card.normal {
+        border-left-color: #22c55e;
+    }
+    
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .risk-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .risk-badge.flood {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .risk-badge.scarcity {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .risk-badge.normal {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="history-container">
+    <a href="{% url 'flood_dashboard' %}" class="back-link">← Back to Dashboard</a>
+    
+    <h1 style="margin-bottom: 30px;">📊 Prediction History</h1>
+    
+    {% if tank %}
+        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+            <h3>{{ tank.name }}</h3>
+            <p>Capacity: {{ tank.capacity_liters|floatformat:0 }}L | Current Level: {{ tank.level_percentage|floatformat:1 }}%</p>
+        </div>
+    {% endif %}
+    
+    {% if predictions %}
+        {% for pred in predictions %}
+        <div class="history-card {{ pred.risk_level }}">
+            <div class="history-header">
+                <span class="risk-badge {{ pred.risk_level }}">
+                    {{ pred.risk_level|upper }}
+                </span>
+                <span style="color: #6b7280; font-size: 14px;">
+                    {{ pred.prediction_time|date:"M d, Y - H:i" }}
+                </span>
+            </div>
+            
+            <div style="margin-top: 12px;">
+                <p><strong>Predicted Rainfall (7 days):</strong> {{ pred.predicted_rainfall_7days|floatformat:1 }} mm</p>
+                <p><strong>Tank Level:</strong> {{ pred.tank_level_pct|floatformat:1 }}%</p>
+                <p><strong>Confidence:</strong> {{ pred.confidence|floatformat:0 }}%</p>
+            </div>
+            
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                <p style="margin-bottom: 8px;"><strong>Alert:</strong> {{ pred.alert_message }}</p>
+                <p style="margin-bottom: 8px;"><strong>Recommended:</strong> {{ pred.recommended_action }}</p>
+                <p><strong>System Action:</strong> {{ pred.system_action }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 8px;">
+            <p style="color: #6b7280; font-size: 18px;">No prediction history yet</p>
+            <p style="color: #9ca3af; margin-top: 8px;">Run your first prediction to see results here</p>
+            <a href="{% url 'flood_dashboard' %}" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+                Go to Dashboard
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

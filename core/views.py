@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -6,7 +6,7 @@ import math
 import json
 from datetime import datetime, timezone
 from .utils import predict_suitability, predict_cost
-from .models import UserWaterSavings, Vendor
+from .models import UserWaterSavings, Vendor, WaterTank, FloodPredictionLog, BorewellEstimation
 from services.rainwater_calculator import (
     calculate_water,
     get_district_rainfall,
@@ -15,7 +15,10 @@ from services.rainwater_calculator import (
 )
 from services.weather_api import get_weather
 from services.water_savings import analyze_savings
-from services.openai_chatbot import chatbot
+from services.gemini_chatbot import chatbot  # Changed from openai_chatbot to gemini_chatbot
+from services.flood_prediction import flood_ai
+from services.weather_forecast import weather_forecast_service
+from services.borewell_estimator import borewell_estimator, RegionType, SoilType
 
 
 def _get_actor_filter(request):
@@ -406,3 +409,386 @@ def chatbot_api(request):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': 'Internal server error'}, status=500)
+
+
+
+def flood_dashboard(request):
+    """Main dashboard for flood prediction and water management"""
+    actor_filter, _ = _get_actor_filter(request)
+    
+    # Get or create default tank
+    tank = WaterTank.objects.filter(**actor_filter).first()
+    
+    # Get latest prediction if exists
+    latest_prediction = None
+    if tank:
+        latest_prediction = FloodPredictionLog.objects.filter(tank=tank).first()
+    
+    return render(request, 'flood_dashboard.html', {
+        'tank': tank,
+        'latest_prediction': latest_prediction,
+    })
+
+
+def water_guard_mvp(request):
+    """Complete MVP dashboard with simulation controls and voice assistant"""
+    actor_filter, _ = _get_actor_filter(request)
+    
+    # Get or create default tank
+    tank = WaterTank.objects.filter(**actor_filter).first()
+    
+    # Get latest prediction if exists
+    latest_prediction = None
+    if tank:
+        latest_prediction = FloodPredictionLog.objects.filter(tank=tank).first()
+    
+    return render(request, 'water_guard_mvp.html', {
+        'tank': tank,
+        'latest_prediction': latest_prediction,
+    })
+
+
+@csrf_exempt
+def flood_prediction_api(request):
+    """API endpoint for AI flood prediction"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            city = data.get('city', '').strip()
+            tank_capacity = float(data.get('tank_capacity', 5000))
+            current_level = float(data.get('current_level', 2500))
+            scenario = data.get('scenario', 'normal')  # Simulation scenario
+            
+            if not city:
+                return JsonResponse({'error': 'City is required'}, status=400)
+            
+            # Get or create tank
+            actor_filter, session_key = _get_actor_filter(request)
+            user = actor_filter.get('user')
+            
+            tank, created = WaterTank.objects.get_or_create(
+                **actor_filter,
+                defaults={
+                    'name': f'{city.title()} Tank',
+                    'capacity_liters': tank_capacity,
+                    'current_level_liters': current_level,
+                    'location': city,
+                }
+            )
+            
+            if not created:
+                tank.capacity_liters = tank_capacity
+                tank.current_level_liters = current_level
+                tank.location = city
+                tank.save()
+            
+            # Get forecast based on scenario
+            if scenario in ['heavy_rain', 'drought', 'normal']:
+                # Use simulated forecast for demo
+                forecast = weather_forecast_service.get_simulated_forecast(scenario)
+            else:
+                # Use real API forecast
+                forecast = weather_forecast_service.get_7day_forecast(city)
+            
+            # Run AI prediction
+            prediction = flood_ai.predict(
+                forecast_data=forecast,
+                current_tank_level_pct=tank.level_percentage,
+                tank_capacity_liters=tank.capacity_liters
+            )
+            
+            # Log prediction
+            FloodPredictionLog.objects.create(
+                tank=tank,
+                risk_level=prediction.risk_level.value,
+                confidence=prediction.confidence,
+                predicted_rainfall_7days=prediction.predicted_rainfall_7days,
+                tank_level_pct=prediction.current_tank_level_pct,
+                recommended_action=prediction.recommended_action,
+                system_action=prediction.system_action,
+                alert_message=prediction.alert_message,
+            )
+            
+            # Prepare forecast data for response
+            forecast_list = [
+                {
+                    'date': f.date,
+                    'rainfall_mm': f.rainfall_mm,
+                    'temperature': f.temperature,
+                    'humidity': f.humidity,
+                }
+                for f in forecast
+            ]
+            
+            return JsonResponse({
+                'success': True,
+                'prediction': prediction.to_dict(),
+                'tank': {
+                    'name': tank.name,
+                    'capacity': tank.capacity_liters,
+                    'current_level': tank.current_level_liters,
+                    'level_percentage': round(tank.level_percentage, 2),
+                },
+                'forecast': forecast_list,
+                'scenario': scenario,
+            })
+            
+        except ValueError as e:
+            return JsonResponse({'error': f'Invalid input: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': 'Internal server error'}, status=500)
+    
+    elif request.method == 'GET':
+        # Get latest prediction
+        actor_filter, _ = _get_actor_filter(request)
+        tank = WaterTank.objects.filter(**actor_filter).first()
+        
+        if not tank:
+            return JsonResponse({'error': 'No tank found'}, status=404)
+        
+        latest_prediction = FloodPredictionLog.objects.filter(tank=tank).first()
+        
+        if not latest_prediction:
+            return JsonResponse({'error': 'No predictions yet'}, status=404)
+        
+        return JsonResponse({
+            'success': True,
+            'prediction': {
+                'risk_level': latest_prediction.risk_level,
+                'confidence': latest_prediction.confidence,
+                'predicted_rainfall_7days': latest_prediction.predicted_rainfall_7days,
+                'tank_level_pct': latest_prediction.tank_level_pct,
+                'recommended_action': latest_prediction.recommended_action,
+                'system_action': latest_prediction.system_action,
+                'alert_message': latest_prediction.alert_message,
+                'prediction_time': latest_prediction.prediction_time.isoformat(),
+            },
+            'tank': {
+                'name': tank.name,
+                'capacity': tank.capacity_liters,
+                'current_level': tank.current_level_liters,
+                'level_percentage': round(tank.level_percentage, 2),
+            },
+        })
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def update_tank_level(request):
+    """API endpoint to update tank water level"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        current_level = float(data.get('current_level', 0))
+        
+        actor_filter, _ = _get_actor_filter(request)
+        tank = WaterTank.objects.filter(**actor_filter).first()
+        
+        if not tank:
+            return JsonResponse({'error': 'No tank found'}, status=404)
+        
+        tank.current_level_liters = current_level
+        tank.save()
+        
+        return JsonResponse({
+            'success': True,
+            'tank': {
+                'current_level': tank.current_level_liters,
+                'level_percentage': round(tank.level_percentage, 2),
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+def prediction_history(request):
+    """View prediction history"""
+    actor_filter, _ = _get_actor_filter(request)
+    tank = WaterTank.objects.filter(**actor_filter).first()
+    
+    predictions = []
+    if tank:
+        predictions = FloodPredictionLog.objects.filter(tank=tank)[:20]
+    
+    return render(request, 'prediction_history.html', {
+        'tank': tank,
+        'predictions': predictions,
+    })
+
+
+
+@csrf_exempt
+def borewell_estimation_api(request):
+    """API endpoint for borewell depth estimation"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            location = data.get('location', '').strip()
+            annual_rainfall = float(data.get('annual_rainfall', 0))
+            region_type_str = data.get('region_type', 'semi_urban')
+            soil_type_str = data.get('soil_type', 'loamy')
+            
+            if not location:
+                return JsonResponse({'error': 'Location is required'}, status=400)
+            
+            if annual_rainfall <= 0:
+                return JsonResponse({'error': 'Valid rainfall data is required'}, status=400)
+            
+            # Convert string to enum
+            try:
+                region_type = RegionType(region_type_str)
+            except ValueError:
+                region_type = RegionType.SEMI_URBAN
+            
+            try:
+                soil_type = SoilType(soil_type_str)
+            except ValueError:
+                soil_type = SoilType.LOAMY
+            
+            # Run estimation
+            estimate = borewell_estimator.estimate_depth(
+                location=location,
+                annual_rainfall_mm=annual_rainfall,
+                region_type=region_type,
+                soil_type=soil_type
+            )
+            
+            # Save to database
+            actor_filter, session_key = _get_actor_filter(request)
+            user = actor_filter.get('user')
+            
+            BorewellEstimation.objects.create(
+                user=user if user is not None else None,
+                session_key=session_key,
+                location=location,
+                annual_rainfall_mm=annual_rainfall,
+                region_type=region_type.value,
+                soil_type=soil_type.value,
+                min_depth_feet=estimate.min_depth_feet,
+                max_depth_feet=estimate.max_depth_feet,
+                recommended_depth_feet=estimate.recommended_depth_feet,
+                confidence_level=estimate.confidence_level,
+                water_availability=estimate.water_availability,
+                estimated_yield_lph=estimate.estimated_yield_lph,
+                reasoning=estimate.reasoning,
+                cost_estimate_min=estimate.cost_estimate_inr[0],
+                cost_estimate_max=estimate.cost_estimate_inr[1],
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'estimation': estimate.to_dict(),
+            })
+            
+        except ValueError as e:
+            return JsonResponse({'error': f'Invalid input: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': 'Internal server error'}, status=500)
+    
+    elif request.method == 'GET':
+        # Get latest estimation
+        actor_filter, _ = _get_actor_filter(request)
+        latest = BorewellEstimation.objects.filter(**actor_filter).first()
+        
+        if not latest:
+            return JsonResponse({'error': 'No estimations yet'}, status=404)
+        
+        return JsonResponse({
+            'success': True,
+            'estimation': {
+                'location': latest.location,
+                'annual_rainfall_mm': latest.annual_rainfall_mm,
+                'region_type': latest.region_type,
+                'soil_type': latest.soil_type,
+                'min_depth_feet': latest.min_depth_feet,
+                'max_depth_feet': latest.max_depth_feet,
+                'recommended_depth_feet': latest.recommended_depth_feet,
+                'confidence_level': latest.confidence_level,
+                'water_availability': latest.water_availability,
+                'estimated_yield_lph': latest.estimated_yield_lph,
+                'reasoning': latest.reasoning,
+                'cost_estimate_min': latest.cost_estimate_min,
+                'cost_estimate_max': latest.cost_estimate_max,
+                'estimation_time': latest.estimation_time.isoformat(),
+            }
+        })
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def borewell_history(request):
+    """View borewell estimation history"""
+    actor_filter, _ = _get_actor_filter(request)
+    estimations = BorewellEstimation.objects.filter(**actor_filter)[:20]
+    
+    return render(request, 'borewell_history.html', {
+        'estimations': estimations,
+    })
+
+
+
+def get_district_rainfall_api(request):
+    """API endpoint to get rainfall data for a district"""
+    district = request.GET.get('district', '').strip()
+    
+    if not district:
+        return JsonResponse({'error': 'District name required'}, status=400)
+    
+    # Validate and get rainfall
+    is_valid, suggestion = validate_district(district)
+    
+    if is_valid:
+        rainfall = get_district_rainfall(district)
+        if rainfall is not None:
+            return JsonResponse({
+                'success': True,
+                'district': district.title(),
+                'rainfall': float(rainfall),
+                'valid': True
+            })
+    
+    # If not valid, try suggestion
+    if suggestion:
+        rainfall = get_district_rainfall(suggestion)
+        if rainfall is not None:
+            return JsonResponse({
+                'success': True,
+                'district': suggestion.title(),
+                'rainfall': float(rainfall),
+                'valid': True,
+                'corrected': True,
+                'original': district
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'valid': False,
+        'message': f'District "{district}" not found in database',
+        'suggestion': suggestion if suggestion else None
+    })
+
+
+def get_all_districts_api(request):
+    """API endpoint to get list of all districts"""
+    from services.rainwater_calculator import VALID_DISTRICTS
+    
+    # Get search query if provided
+    query = request.GET.get('q', '').strip().lower()
+    
+    if query:
+        # Filter districts matching query
+        matching = [d for d in VALID_DISTRICTS if query in d.lower()]
+        districts = matching[:50]  # Limit to 50 results
+    else:
+        # Return first 100 districts
+        districts = list(VALID_DISTRICTS)[:100]
+    
+    return JsonResponse({
+        'success': True,
+        'districts': [d.title() for d in districts],
+        'total': len(VALID_DISTRICTS)
+    })

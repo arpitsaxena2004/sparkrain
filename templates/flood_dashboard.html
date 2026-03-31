@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Water Guard - JalNidhi{% endblock %}
+
+{% block content %}
+<style>
+    .flood-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .tank-visual {
+        position: relative;
+        width: 200px;
+        height: 300px;
+        border: 3px solid #333;
+        border-radius: 8px;
+        margin: 20px auto;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+    
+    .tank-water {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: linear-gradient(to top, #3b82f6, #60a5fa);
+        transition: height 0.5s ease;
+    }
+    
+    .tank-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        z-index: 10;
+    }
+    
+    .forecast-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .forecast-day {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .forecast-day.rain {
+        background: #dbeafe;
+        border-color: #3b82f6;
+    }
+    
+    .alert-box {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+    
+    .alert-normal {
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #22c55e;
+    }
+    
+    .alert-flood {
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-scarcity {
+        background: #fef3c7;
+        color: #92400e;
+        border-left: 4px solid #eab308;
+    }
+    
+    .input-group {
+        margin-bottom: 16px;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+    
+    .btn-predict {
+        background: #3b82f6;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+    }
+    
+    .btn-predict:hover {
+        background: #2563eb;
+    }
+    
+    .btn-predict:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+    
+    .action-card {
+        background: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        padding: 16px;
+        border-radius: 6px;
+        margin-top: 12px;
+    }
+    
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="flood-dashboard">
+    <h1 style="text-align: center; margin-bottom: 30px;">💧 Water Guard - AI Risk & Management</h1>
+    
+    <div id="alertBox" class="alert-box alert-normal" style="display: none;">
+        <span id="alertMessage"></span>
+    </div>
+    
+    <div class="grid-2">
+        <!-- Input Section -->
+        <div class="status-card">
+            <h2>System Configuration</h2>
+            
+            <div class="input-group">
+                <label for="city">City/District</label>
+                <input type="text" id="city" placeholder="e.g., Mumbai, Delhi" value="Mumbai">
+            </div>
+            
+            <div class="input-group">
+                <label for="tankCapacity">Tank Capacity (Liters)</label>
+                <input type="number" id="tankCapacity" placeholder="e.g., 5000" value="5000">
+            </div>
+            
+            <div class="input-group">
+                <label for="currentLevel">Current Water Level (Liters)</label>
+                <input type="number" id="currentLevel" placeholder="e.g., 2500" value="2500">
+            </div>
+            
+            <button class="btn-predict" onclick="runPrediction()">
+                🤖 Run AI Prediction
+            </button>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="{% url 'prediction_history' %}" style="color: #3b82f6; text-decoration: none;">
+                    📊 View Prediction History
+                </a>
+            </div>
+        </div>
+        
+        <!-- Tank Visual -->
+        <div class="status-card">
+            <h2 style="text-align: center;">Tank Status</h2>
+            <div class="tank-visual">
+                <div class="tank-water" id="tankWater" style="height: 50%;"></div>
+                <div class="tank-label" id="tankLabel">50%</div>
+            </div>
+            <div style="text-align: center; color: #6b7280;">
+                <p id="tankInfo">Capacity: 5000L | Current: 2500L</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prediction Results -->
+    <div class="status-card" id="predictionResults" style="display: none;">
+        <h2>
+            <span class="status-indicator" id="statusIndicator"></span>
+            AI Prediction Results
+        </h2>
+        
+        <div style="margin-top: 20px;">
+            <h3>Status: <span id="riskLevel"></span></h3>
+            <p><strong>Confidence:</strong> <span id="confidence"></span>%</p>
+            <p><strong>7-Day Rainfall Forecast:</strong> <span id="rainfall7day"></span> mm</p>
+        </div>
+        
+        <div class="action-card">
+            <h4>💡 Recommended Action</h4>
+            <p id="recommendedAction"></p>
+        </div>
+        
+        <div class="action-card">
+            <h4>⚙️ System Action</h4>
+            <p id="systemAction"></p>
+        </div>
+    </div>
+    
+    <!-- Forecast -->
+    <div class="status-card" id="forecastSection" style="display: none;">
+        <h2>7-Day Weather Forecast</h2>
+        <div class="forecast-grid" id="forecastGrid"></div>
+    </div>
+    
+    <!-- How It Works -->
+    <div class="status-card">
+        <h2>🧠 How It Works</h2>
+        <ol style="line-height: 1.8;">
+            <li><strong>Data Collection:</strong> System fetches real-time weather forecast for next 7 days</li>
+            <li><strong>AI Analysis:</strong> Analyzes rainfall patterns to detect flood risk or water scarcity</li>
+            <li><strong>Risk Classification:</strong>
+                <ul>
+                    <li>🔴 Flood Risk: Rainfall > 50mm/day detected</li>
+                    <li>🟡 Water Scarcity: Rainfall < 5mm/day for 3+ consecutive days</li>
+                    <li>🟢 Normal: Optimal rainfall conditions</li>
+                </ul>
+            </li>
+            <li><strong>Smart Decisions:</strong> System automatically optimizes water storage:
+                <ul>
+                    <li>Flood Risk → Release water if tank >80% to create storage space</li>
+                    <li>Scarcity → Activate conservation mode, store maximum water</li>
+                </ul>
+            </li>
+            <li><strong>Automation:</strong> Controls valves/pumps to prevent overflow and wastage</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+let predictionData = null;
+
+function updateTankVisual(percentage) {
+    const tankWater = document.getElementById('tankWater');
+    const tankLabel = document.getElementById('tankLabel');
+    tankWater.style.height = percentage + '%';
+    tankLabel.textContent = Math.round(percentage) + '%';
+}
+
+function updateTankInfo(capacity, current) {
+    document.getElementById('tankInfo').textContent = 
+        `Capacity: ${capacity}L | Current: ${current}L`;
+}
+
+async function runPrediction() {
+    const city = document.getElementById('city').value.trim();
+    const tankCapacity = parseFloat(document.getElementById('tankCapacity').value);
+    const currentLevel = parseFloat(document.getElementById('currentLevel').value);
+    
+    if (!city) {
+        alert('Please enter a city name');
+        return;
+    }
+    
+    if (isNaN(tankCapacity) || tankCapacity <= 0) {
+        alert('Please enter a valid tank capacity');
+        return;
+    }
+    
+    if (isNaN(currentLevel) || currentLevel < 0 || currentLevel > tankCapacity) {
+        alert('Please enter a valid current water level');
+        return;
+    }
+    
+    const btn = document.querySelector('.btn-predict');
+    btn.disabled = true;
+    btn.textContent = '⏳ Analyzing...';
+    
+    try {
+        const response = await fetch('{% url "flood_prediction_api" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                city: city,
+                tank_capacity: tankCapacity,
+                current_level: currentLevel,
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            displayPrediction(data);
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Failed to get prediction. Please try again.');
+        console.error(error);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🤖 Run AI Prediction';
+    }
+}
+
+function displayPrediction(data) {
+    predictionData = data;
+    
+    // Update tank visual
+    updateTankVisual(data.tank.level_percentage);
+    updateTankInfo(data.tank.capacity, data.tank.current_level);
+    
+    // Show alert
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    alertBox.style.display = 'block';
+    alertMessage.textContent = data.prediction.alert_message;
+    
+    // Set alert color
+    alertBox.className = 'alert-box';
+    if (data.prediction.risk_level === 'flood_risk') {
+        alertBox.classList.add('alert-flood');
+    } else if (data.prediction.risk_level === 'scarcity') {
+        alertBox.classList.add('alert-scarcity');
+    } else {
+        alertBox.classList.add('alert-normal');
+    }
+    
+    // Update status indicator
+    const statusIndicator = document.getElementById('statusIndicator');
+    statusIndicator.style.background = data.prediction.color_code;
+    
+    // Show prediction results
+    document.getElementById('predictionResults').style.display = 'block';
+    document.getElementById('riskLevel').textContent = 
+        data.prediction.risk_level.replace('_', ' ').toUpperCase();
+    document.getElementById('confidence').textContent = 
+        (data.prediction.confidence * 100).toFixed(0);
+    document.getElementById('rainfall7day').textContent = 
+        data.prediction.predicted_rainfall_7days.toFixed(1);
+    document.getElementById('recommendedAction').textContent = 
+        data.prediction.recommended_action;
+    document.getElementById('systemAction').textContent = 
+        data.prediction.system_action;
+    
+    // Display forecast
+    displayForecast(data.forecast);
+    
+    // Scroll to results
+    document.getElementById('predictionResults').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest' 
+    });
+}
+
+function displayForecast(forecast) {
+    const forecastGrid = document.getElementById('forecastGrid');
+    forecastGrid.innerHTML = '';
+    
+    forecast.forEach(day => {
+        const dayCard = document.createElement('div');
+        dayCard.className = 'forecast-day';
+        if (day.rainfall_mm > 10) {
+            dayCard.classList.add('rain');
+        }
+        
+        const date = new Date(day.date);
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        
+        dayCard.innerHTML = `
+            <div style="font-weight: 600; margin-bottom: 8px;">${dayName}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                ${date.getDate()}/${date.getMonth() + 1}
+            </div>
+            <div style="font-size: 20px; margin-bottom: 4px;">
+                ${day.rainfall_mm > 0 ? '🌧️' : '☀️'}
+            </div>
+            <div style="font-weight: 600; color: #3b82f6;">
+                ${day.rainfall_mm.toFixed(1)}mm
+            </div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                ${day.temperature}°C
+            </div>
+        `;
+        
+        forecastGrid.appendChild(dayCard);
+    });
+    
+    document.getElementById('forecastSection').style.display = 'block';
+}
+
+// Initialize with default values
+window.addEventListener('load', () => {
+    const currentLevel = parseFloat(document.getElementById('currentLevel').value);
+    const tankCapacity = parseFloat(document.getElementById('tankCapacity').value);
+    const percentage = (currentLevel / tankCapacity) * 100;
+    updateTankVisual(percentage);
+    updateTankInfo(tankCapacity, currentLevel);
+});
+
+// Update tank visual when inputs change
+document.getElementById('currentLevel').addEventListener('input', (e) => {
+    const currentLevel = parseFloat(e.target.value) || 0;
+    const tankCapacity = parseFloat(document.getElementById('tankCapacity').value) || 5000;
+    const percentage = Math.min(100, (currentLevel / tankCapacity) * 100);
+    updateTankVisual(percentage);
+    updateTankInfo(tankCapacity, currentLevel);
+});
+
+document.getElementById('tankCapacity').addEventListener('input', (e) => {
+    const tankCapacity = parseFloat(e.target.value) || 5000;
+    const currentLevel = parseFloat(document.getElementById('currentLevel').value) || 0;
+    const percentage = Math.min(100, (currentLevel / tankCapacity) * 100);
+    updateTankVisual(percentage);
+    updateTankInfo(tankCapacity, currentLevel);
+});
+</script>
+{% endblock %}
