@@ -26,4 +26,7 @@ urlpatterns = [
     path('borewell/history/', views.borewell_history, name='borewell_history'),
     path('api/district/rainfall/', views.get_district_rainfall_api, name='get_district_rainfall_api'),
     path('api/districts/', views.get_all_districts_api, name='get_all_districts_api'),
+    
+    # System diagnostics
+    path('health/', views.system_health_check, name='system_health_check'),
 ]

@@ -432,20 +432,60 @@ def flood_dashboard(request):
 
 def water_guard_mvp(request):
     """Complete MVP dashboard with simulation controls and voice assistant"""
-    actor_filter, _ = _get_actor_filter(request)
-    
-    # Get or create default tank
-    tank = WaterTank.objects.filter(**actor_filter).first()
-    
-    # Get latest prediction if exists
-    latest_prediction = None
-    if tank:
-        latest_prediction = FloodPredictionLog.objects.filter(tank=tank).first()
-    
-    return render(request, 'water_guard_mvp.html', {
-        'tank': tank,
-        'latest_prediction': latest_prediction,
-    })
+    try:
+        actor_filter, _ = _get_actor_filter(request)
+        
+        # Get or create default tank
+        tank = WaterTank.objects.filter(**actor_filter).first()
+        
+        # Get latest prediction if exists
+        latest_prediction = None
+        if tank:
+            latest_prediction = FloodPredictionLog.objects.filter(tank=tank).first()
+        
+        return render(request, 'water_guard_mvp.html', {
+            'tank': tank,
+            'latest_prediction': latest_prediction,
+        })
+    except Exception as e:
+        # Log the error with full traceback
+        import traceback
+        import sys
+        
+        error_details = {
+            'error_type': type(e).__name__,
+            'error_message': str(e),
+            'traceback': traceback.format_exc()
+        }
+        
+        # Print to console for Render logs
+        print("=" * 80)
+        print("ERROR IN water_guard_mvp VIEW")
+        print("=" * 80)
+        print(f"Error Type: {error_details['error_type']}")
+        print(f"Error Message: {error_details['error_message']}")
+        print("\nFull Traceback:")
+        print(error_details['traceback'])
+        print("=" * 80)
+        sys.stdout.flush()
+        
+        # Return error page with details if DEBUG is True
+        from django.conf import settings
+        if settings.DEBUG:
+            return HttpResponse(
+                f"<h1>Error in water_guard_mvp</h1>"
+                f"<p><strong>Type:</strong> {error_details['error_type']}</p>"
+                f"<p><strong>Message:</strong> {error_details['error_message']}</p>"
+                f"<pre>{error_details['traceback']}</pre>",
+                status=500
+            )
+        
+        # Production: Return safe error page
+        return render(request, 'water_guard_mvp.html', {
+            'tank': None,
+            'latest_prediction': None,
+            'error': 'System is initializing. Please try again in a moment.'
+        })
 
 
 def rainwater_animation(request):
@@ -465,7 +505,7 @@ def flood_prediction_api(request):
             scenario = data.get('scenario', 'normal')  # Simulation scenario
             
             if not city:
-                return JsonResponse({'error': 'City is required'}, status=400)
+                return JsonResponse({'success': False, 'error': 'City is required'}, status=400)
             
             # Get or create tank
             actor_filter, session_key = _get_actor_filter(request)
@@ -539,9 +579,21 @@ def flood_prediction_api(request):
             })
             
         except ValueError as e:
-            return JsonResponse({'error': f'Invalid input: {str(e)}'}, status=400)
+            import traceback
+            print(f"ValueError in flood_prediction_api: {str(e)}")
+            print(traceback.format_exc())
+            return JsonResponse({'success': False, 'error': f'Invalid input: {str(e)}'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': 'Internal server error'}, status=500)
+            import traceback
+            import sys
+            print("=" * 80)
+            print("ERROR IN flood_prediction_api")
+            print("=" * 80)
+            print(f"Error: {str(e)}")
+            print(traceback.format_exc())
+            print("=" * 80)
+            sys.stdout.flush()
+            return JsonResponse({'success': False, 'error': 'Internal server error', 'details': str(e) if DEBUG else None}, status=500)
     
     elif request.method == 'GET':
         # Get latest prediction
@@ -797,3 +849,67 @@ def get_all_districts_api(request):
         'districts': [d.title() for d in districts],
         'total': len(VALID_DISTRICTS)
     })
+
+
+def system_health_check(request):
+    """Diagnostic endpoint to check system health"""
+    import os
+    from pathlib import Path
+    from django.conf import settings
+    
+    health = {
+        'status': 'ok',
+        'checks': {}
+    }
+    
+    # Check database
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        health['checks']['database'] = 'OK'
+    except Exception as e:
+        health['checks']['database'] = f'ERROR: {str(e)}'
+        health['status'] = 'error'
+    
+    # Check models
+    try:
+        tank_count = WaterTank.objects.count()
+        health['checks']['models'] = f'OK (WaterTank count: {tank_count})'
+    except Exception as e:
+        health['checks']['models'] = f'ERROR: {str(e)}'
+        health['status'] = 'error'
+    
+    # Check ML models directory
+    ml_models_dir = settings.BASE_DIR / 'ml_models'
+    if ml_models_dir.exists():
+        ml_files = list(ml_models_dir.glob('*.pkl'))
+        health['checks']['ml_models'] = f'OK ({len(ml_files)} files found)'
+    else:
+        health['checks']['ml_models'] = 'WARNING: ml_models directory not found'
+    
+    # Check services
+    try:
+        from services import flood_prediction, weather_forecast, borewell_estimator
+        health['checks']['services'] = 'OK (all services imported)'
+    except Exception as e:
+        health['checks']['services'] = f'ERROR: {str(e)}'
+        health['status'] = 'error'
+    
+    # Check environment variables
+    env_vars = {
+        'DEBUG': os.getenv('DEBUG', 'Not set'),
+        'DATABASE_URL': 'Set' if os.getenv('DATABASE_URL') else 'Not set',
+        'OPENWEATHER_API_KEY': 'Set' if os.getenv('OPENWEATHER_API_KEY') else 'Not set',
+        'GEMINI_API_KEY': 'Set' if os.getenv('GEMINI_API_KEY') else 'Not set',
+    }
+    health['checks']['environment'] = env_vars
+    
+    # Check static files
+    static_root = settings.STATIC_ROOT
+    if static_root and Path(static_root).exists():
+        health['checks']['static_files'] = 'OK'
+    else:
+        health['checks']['static_files'] = 'WARNING: STATIC_ROOT not found'
+    
+    return JsonResponse(health, json_dumps_params={'indent': 2})
