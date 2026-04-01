@@ -481,10 +481,14 @@ def water_guard_mvp(request):
             )
         
         # Production: Return safe error page
+        import sys
+        print(f"CRITICAL: Rendering water_guard_mvp with error: {error_details['error_message']}")
+        sys.stdout.flush()
+        
         return render(request, 'water_guard_mvp.html', {
             'tank': None,
             'latest_prediction': None,
-            'error': 'System is initializing. Please try again in a moment.'
+            'error': f"System is initializing ({error_details['error_type']}). Please try again in a moment."
         })
 
 
@@ -906,10 +910,21 @@ def system_health_check(request):
     health['checks']['environment'] = env_vars
     
     # Check static files
-    static_root = settings.STATIC_ROOT
-    if static_root and Path(static_root).exists():
-        health['checks']['static_files'] = 'OK'
-    else:
-        health['checks']['static_files'] = 'WARNING: STATIC_ROOT not found'
-    
+    try:
+        static_root = settings.STATIC_ROOT
+        if static_root and Path(static_root).exists():
+            static_files = list(Path(static_root).glob('**/*'))
+            health['checks']['static_files'] = f'OK ({len(static_files)} files in STATIC_ROOT)'
+        else:
+            health['checks']['static_files'] = f'WARNING: STATIC_ROOT not found at {static_root}'
+    except Exception as e:
+        health['checks']['static_files'] = f'ERROR: {str(e)}'
+
+    # Check for specific suspicious 'apps' module
+    try:
+        import apps
+        health['checks']['apps_module'] = f'FOUND: {apps.__file__}'
+    except ImportError:
+        health['checks']['apps_module'] = 'NOT FOUND (expected)'
+
     return JsonResponse(health, json_dumps_params={'indent': 2})

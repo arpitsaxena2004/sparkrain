@@ -35,4 +35,26 @@ echo "=== Running migrations ==="
 python manage.py migrate --verbosity 2
 
 echo ""
+echo "=== Validating ML models ==="
+required_models=(
+    "ml_models/suitability_model.pkl"
+    "ml_models/scaler.pkl"
+    "ml_models/encoder.pkl"
+    "ml_models/cost_model.pkl"
+    "ml_models/cost_encoder.pkl"
+)
+
+for model in "${required_models[@]}"; do
+    if [ ! -f "$model" ]; then
+        echo "⚠️  WARNING: Missing $model"
+    else
+        echo "✅ Found $model"
+    fi
+done
+
+echo ""
+echo "=== Running Django check ==="
+python manage.py check
+
+echo ""
 echo "=== Build completed successfully! ==="
