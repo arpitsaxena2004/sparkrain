@@ -108,8 +108,8 @@
     <nav class="text-white sticky top-0 z-50" style="background: #0891b2; box-shadow: 0 2px 8px rgba(8, 145, 178, 0.15);">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-3 md:py-4">
-                <a href="{% url 'home' %}" class="responsive-text-xl font-bold flex items-center gap-3" style="color: white;">
-                    <img src="{% static 'core/jalnidhi-logo.png' %}" alt="JalNidhi Logo" class="h-10 md:h-12 w-auto object-contain rounded-full bg-white p-0.5 shadow-sm">
+                <a href="{% url 'home' %}" class="responsive-text-2xl font-bold flex items-center gap-4" style="color: white;">
+                    <img src="{% static 'core/jalnidhi-logo.png' %}" alt="JalNidhi Logo" class="h-14 md:h-18 w-auto object-contain rounded-full bg-white p-1 shadow-md">
                     <span class="hidden sm:inline">JalNidhi AI</span>
                     <span class="sm:hidden">JalNidhi</span>
                 </a>
@@ -123,26 +123,26 @@
                 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-6">
-                    <a href="{% url 'home' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">Home</a>
-                    <a href="{% url 'dashboard' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">Dashboard</a>
-                    <a href="{% url 'water_guard_mvp' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">💧 Water Guard MVP</a>
-                    <a href="{% url 'rainwater_animation' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">🌊 Live Demo</a>
-                    <a href="{% url 'analytics' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">Analytics</a>
-                    <a href="{% url 'vendors' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">Vendors</a>
-                    <a href="{% url 'about' %}" class="transition touch-target flex items-center" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">About</a>
+                    <a href="{% url 'home' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">🏠 Home</a>
+                    <a href="{% url 'dashboard' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">📊 Dashboard</a>
+                    <a href="{% url 'water_guard_mvp' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">💧 Water Guard MVP</a>
+                    <a href="{% url 'rainwater_animation' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">🌊 Live Demo</a>
+                    <a href="{% url 'analytics' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">📈 Analytics</a>
+                    <a href="{% url 'vendors' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">🏪 Vendors</a>
+                    <a href="{% url 'about' %}" class="transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.9)'">ℹ️ About</a>
                 </div>
             </div>
             
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden pb-4 border-t mt-3" style="border-color: rgba(255,255,255,0.2);">
                 <div class="flex flex-col space-y-2 pt-3">
-                    <a href="{% url 'home' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">Home</a>
-                    <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">Dashboard</a>
-                    <a href="{% url 'water_guard_mvp' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">💧 Water Guard MVP</a>
-                    <a href="{% url 'rainwater_animation' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">🌊 Live Demo</a>
-                    <a href="{% url 'analytics' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">Analytics</a>
-                    <a href="{% url 'vendors' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">Vendors</a>
-                    <a href="{% url 'about' %}" class="block px-3 py-2 rounded-lg transition touch-target" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">About</a>
+                    <a href="{% url 'home' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">🏠 Home</a>
+                    <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">📊 Dashboard</a>
+                    <a href="{% url 'water_guard_mvp' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">💧 Water Guard MVP</a>
+                    <a href="{% url 'rainwater_animation' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">🌊 Live Demo</a>
+                    <a href="{% url 'analytics' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">📈 Analytics</a>
+                    <a href="{% url 'vendors' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">🏪 Vendors</a>
+                    <a href="{% url 'about' %}" class="block px-3 py-2 rounded-lg transition touch-target flex items-center gap-2" style="color: rgba(255,255,255,0.9); font-weight: 500;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='rgba(255,255,255,0.9)'">ℹ️ About</a>
                 </div>
             </div>
         </div>
@@ -152,13 +152,13 @@
         <!-- Mobile-Responsive Sidebar -->
         <aside class="hidden md:block w-64 bg-white shadow-xl h-screen sticky top-[72px]">
             <div class="p-6 space-y-4">
-                <a href="{% url 'home' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Home</a>
-                <a href="{% url 'dashboard' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Dashboard</a>
-                <a href="{% url 'water_guard_mvp' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">💧 Water Guard MVP</a>
-                <a href="{% url 'rainwater_animation' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">🌊 Live Demo</a>
-                <a href="{% url 'analytics' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Analytics</a>
-                <a href="{% url 'vendors' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">Vendors</a>
-                <a href="{% url 'about' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target">About</a>
+                <a href="{% url 'home' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">🏠 Home</a>
+                <a href="{% url 'dashboard' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">📊 Dashboard</a>
+                <a href="{% url 'water_guard_mvp' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">💧 Water Guard MVP</a>
+                <a href="{% url 'rainwater_animation' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">🌊 Live Demo</a>
+                <a href="{% url 'analytics' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">📈 Analytics</a>
+                <a href="{% url 'vendors' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">🏪 Vendors</a>
+                <a href="{% url 'about' %}" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition font-medium touch-target flex items-center gap-2">ℹ️ About</a>
             </div>
         </aside>
 
